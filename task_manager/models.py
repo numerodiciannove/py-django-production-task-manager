@@ -7,11 +7,17 @@ class Position(models.Model):
         max_length=100, unique=True,
     )
 
+    def __str__(self):
+        return self.name
+
 
 class TaskType(models.Model):
     name = models.CharField(
         max_length=100,
     )
+
+    def __str__(self):
+        return self.name
 
 
 class Task(models.Model):
@@ -23,7 +29,8 @@ class Task(models.Model):
     ]
     name = models.CharField(max_length=255, )
     description = models.TextField()
-    deadline = models.DateField()
+    start_time = models.DateTimeField(null=True)
+    deadline = models.DateTimeField(null=True)
     is_complete = models.BooleanField(default=False)
     task_type = models.ForeignKey(TaskType, on_delete=models.CASCADE)
     priority = models.CharField(
@@ -32,7 +39,10 @@ class Task(models.Model):
     )
 
     class Meta:
-        ordering = ["name"]
+        ordering = ["name", ]
+
+    def __str__(self):
+        return self.name
 
 
 class Worker(AbstractUser):
@@ -49,8 +59,8 @@ class Worker(AbstractUser):
 
     def __str__(self):
         return (
-            f"{self.username}: "
-            f"({self.first_name} {self.last_name}) {self.position}"
+            f"{self.username} "
+            f"({self.first_name} {self.last_name}) - {self.position}"
         )
 
 
@@ -65,7 +75,7 @@ class Project(models.Model):
         ordering = ["name", ]
 
     def __str__(self):
-        return f"{self.name}: ({self.tasks})"
+        return self.name
 
 
 class Team(models.Model):
@@ -77,3 +87,6 @@ class Team(models.Model):
 
     class Meta:
         ordering = ["name", ]
+
+    def __str__(self):
+        return self.name
