@@ -7,6 +7,9 @@ class Position(models.Model):
         max_length=100, unique=True,
     )
 
+    class Meta:
+        ordering = ["name", ]
+
     def __str__(self):
         return self.name
 
@@ -15,6 +18,9 @@ class TaskType(models.Model):
     name = models.CharField(
         max_length=100,
     )
+
+    class Meta:
+        ordering = ["name", ]
 
     def __str__(self):
         return self.name
@@ -27,12 +33,17 @@ class Task(models.Model):
         ("medium", "Medium"),
         ("low", "Low"),
     ]
+
     name = models.CharField(max_length=255, )
     description = models.TextField()
     start_time = models.DateTimeField(null=True)
     deadline = models.DateTimeField(null=True)
     is_complete = models.BooleanField(default=False)
-    task_type = models.ForeignKey(TaskType, on_delete=models.CASCADE)
+    task_type = models.ManyToManyField(
+        TaskType,
+        blank=True,
+        related_name="tasks",
+    )
     priority = models.CharField(
         max_length=10,
         choices=PRIORITY_CHOICES,
@@ -56,6 +67,9 @@ class Worker(AbstractUser):
         unique=True,
         help_text="For example '+380951911919'. Without quotes"
     )
+
+    class Meta:
+        ordering = ["position", ]
 
     def __str__(self):
         return (
@@ -82,6 +96,7 @@ class Team(models.Model):
     name = models.CharField(max_length=100, unique=True)
     projects = models.ManyToManyField(
         Project,
+        blank=True,
         related_name="teams",
     )
 
