@@ -80,6 +80,7 @@ class Worker(AbstractUser):
 
 class Project(models.Model):
     name = models.CharField(max_length=50, unique=True)
+    is_complete = models.BooleanField(default=False)
     tasks = models.ManyToManyField(
         Task,
         related_name="projects",
