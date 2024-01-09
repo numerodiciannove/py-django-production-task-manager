@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <link rel="stylesheet" type="text/css"
+        href="https://pixinvent.com/stack-responsive-bootstrap-4-admin-template/app-assets/css/bootstrap-extended.min.css">
+  <link rel="stylesheet" type="text/css"
+        href="https://pixinvent.com/stack-responsive-bootstrap-4-admin-template/app-assets/fonts/simple-line-icons/style.min.css">
+  <div class="grey-bg container-fluid">
+    <section id="minimal-statistics">
+      <div class="row">
+        <div class="col-12 mt-3 mb-1">
+          <div class="text-center">
+            <h4 class="text-uppercase">Welcome to production task manager!</h4>
+          </div>
+          <br>
+          <h6 class="text-uppercase">The Production Task Manager has the
+            following record counts:</h6>
+        </div>
+      </div>
+      <div class="row">
+        {% for item in main_page_cards %}
+          <div class="col-xl-3 col-sm-6 col-12">
+            {% include "includes/cards_progress.html" with card=item %}
+          </div>
+        {% endfor %}
+      </div>
+      <div class="progress" role="progressbar" aria-label="Warning example"
+           aria-valuenow="{{ percent_tasks_completed }}" aria-valuemin="0"
+           aria-valuemax="100">
+        <div class="progress-bar bg-warning text-dark"
+             style="width: {{ percent_tasks_completed }}%"> {{ percent_tasks_completed|floatformat:"0" }}%
+          TASKS COMPLETED
+        </div>
+      </div>
+      <div class="progress" role="progressbar" aria-label="Warning example"
+           aria-valuenow="{{ percent_projects_completed }}" aria-valuemin="0"
+           aria-valuemax="100">
+        <div class="progress-bar bg-warning text-dark"
+             style="width: {{ percent_projects_completed }}%"> {{ percent_projects_completed|floatformat:"0" }}%
+          PROJECTS COMPLETED
+        </div>
+      </div>
+    </section>
+  </div>
+{% endblock %}
