@@ -74,6 +74,7 @@ class ProjectAdmin(admin.ModelAdmin):
         "name",
         "get_task_list",
         "is_complete",
+        "budget",
     )
     search_fields = ("name", )
     list_filter = ("is_complete", )

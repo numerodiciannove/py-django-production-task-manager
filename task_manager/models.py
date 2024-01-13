@@ -6,6 +6,7 @@ class Project(models.Model):
     name = models.CharField(max_length=50, unique=True)
     is_complete = models.BooleanField(default=False, db_index=True)
     description = models.TextField(null=True, blank=True)
+    budget = models.IntegerField(null=True, blank=True)
 
     class Meta:
         ordering = ["name", ]
@@ -109,6 +110,7 @@ class Team(models.Model):
     workers = models.ManyToManyField(
         Worker,
         blank=True,
+        related_name="teams",
     )
 
     class Meta:
