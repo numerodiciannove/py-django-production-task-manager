@@ -1,7 +1,8 @@
 from django.db.models import QuerySet
-from django.shortcuts import render
-from django.urls import reverse
+from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse_lazy
 from django.views import generic
+from .forms import ProjectTaskForm
 from .utils import calculate_percentage
 from task_manager.models import Task, Worker, Project, Team, Position
 
@@ -150,3 +151,59 @@ class ProjectDetailView(generic.DetailView):
             }
             tasks_info.append(task_info)
         return tasks_info
+
+
+def project_task_create(request, pk):
+    project = Project.objects.get(pk=pk)
+
+    if request.method == 'POST':
+        form = ProjectTaskForm(request.POST)
+        if form.is_valid():
+            task = form.save(commit=False)
+            task.project = project
+            task.save()
+            return redirect(
+                "task_manager:project-detail",
+                pk=project.id
+            )
+    else:
+        form = ProjectTaskForm()
+
+    return render(request,
+                  'task_manager/projects/project_task_create_update.html',
+                  {'form': form, 'project': project, "name": "create"}, )
+
+
+def project_task_update(request, project_id, task_id):
+    project = get_object_or_404(Project, pk=project_id)
+    task = get_object_or_404(Task, pk=task_id, project=project)
+
+    if request.method == 'POST':
+        form = ProjectTaskForm(request.POST, instance=task)
+        if form.is_valid():
+            form.save()
+            return redirect("task_manager:project-detail", pk=project.id)
+    else:
+        form = ProjectTaskForm(instance=task)
+
+    return render(request,
+                  'task_manager/projects/project_task_create_update.html',
+                  {'form': form, 'project': project, "name": "update"})
+
+
+class ProjectTaskDeleteView(generic.DeleteView):
+    model = Task
+    template_name = 'task_manager/projects/project_task_delete.html'
+    context_object_name = 'task'
+
+    def get_success_url(self):
+        project_id = self.kwargs.get('project_id')
+        return reverse_lazy('task_manager:project-detail',
+                            kwargs={'pk': project_id})
+
+    def get_object(self, queryset=None):
+        project_id = self.kwargs.get('project_id')
+        task_id = self.kwargs.get('pk')
+        project = get_object_or_404(Project, id=project_id)
+        task = get_object_or_404(Task, id=task_id, project=project)
+        return task
