@@ -45,10 +45,15 @@ class WorkerAdmin(UserAdmin):
     list_display = UserAdmin.list_display + (
         "position",
         "phone_number",
+        "country",
     )
     fieldsets = UserAdmin.fieldsets + (
         (
-            ("Additional info", {"fields": ("position", "phone_number",)}),)
+            ("Additional info", {
+                "fields": ("position", "phone_number", "country")
+            }
+             ),
+        )
     )
     add_fieldsets = UserAdmin.add_fieldsets + (
         (
@@ -58,6 +63,7 @@ class WorkerAdmin(UserAdmin):
                     "fields": (
                         "position",
                         "phone_number",
+                        "country",
                     )
                 },
             ),
@@ -65,6 +71,7 @@ class WorkerAdmin(UserAdmin):
     )
     list_filter = [
         "position",
+        "country",
     ]
 
 

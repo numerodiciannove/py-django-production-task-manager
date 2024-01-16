@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django_countries.fields import CountryField
 
 
 class Project(models.Model):
@@ -87,6 +88,7 @@ class Worker(AbstractUser):
         max_length=13,
         help_text="For example '+380951911919'. Without quotes"
     )
+    country = CountryField(blank=True)
 
     class Meta:
         ordering = ["position", ]
