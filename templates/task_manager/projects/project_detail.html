@@ -7,79 +7,81 @@
         <div class="col-xl-10 mx-auto d-flex flex-column h-100">
           <div class="card flex-grow-1">
             <div class="card-body p-5">
-              <div
-                  style="display: flex; justify-content: space-between; align-items: center;">
-                <p class="h2"
-                   style="margin-right: 10px;">{{ project.name }}</p>
+              <div class="d-flex justify-content-between align-items-center">
+                <p class="h2">{{ project.name }}</p>
                 <div>
                   {% if project.is_complete %}
-                    <span
-                        class="badge rounded-pill bg-danger">Completed</span>
+                    <span class="badge bg-danger">Completed</span>
                   {% else %}
-                    <span class="badge rounded-pill bg-success">Active</span>
+                    <span class="badge bg-success">Active</span>
                   {% endif %}
                 </div>
+                <div>
+                  <a href="{% url 'task_manager:project-update' project_id=project.id %}" class="btn btn-dark btn-sm"><i class="bi bi-pencil"></i></a>
+                  <a href="{% url 'task_manager:project-delete' project_id=project.id %}" class="btn btn-danger btn-sm"><i class="bi bi-trash3-fill"></i></a>
+                </div>
               </div>
-              <dl class="row">
-                <dl class="row">
-                  <dt class="col-sm-3" style="color: black;">Team:</dt>
-                  <dd class="col-sm-9" style="color: black;">
-                    <span
-                        class="badge rounded-pill bg-success">{{ project.teams.first.name }}
-                    </span>
-                  </dd>
-                  <dt class="col-sm-3" style="color: black;">Workers:</dt>
-                  <dd class="col-sm-9" style="color: black;">
+              <dl class="row" style="color: black;">
+                <dt class="col-sm-3">Team:</dt>
+                <dd class="col-sm-9">
+                  {% if project.teams.first %}
+                    <span class="badge rounded-pill bg-success">{{ project.teams.first.name }}</span>
+                  {% else %}
+                    <span class="badge rounded-pill bg-warning">No Team</span>
+                  {% endif %}
+                </dd>
+
+                {% if project.teams.first %}
+                  <dt class="col-sm-3">Workers:</dt>
+                  <dd class="col-sm-9">
                     <table class="table">
                       <thead>
-                      <tr>
-                        <th scope="col">Name</th>
-                        <th scope="col">Position</th>
-                        <th scope="col">Phone Number</th>
-                      </tr>
+                        <tr>
+                          <th scope="col">Name</th>
+                          <th scope="col">Position</th>
+                          <th scope="col">Phone Number</th>
+                        </tr>
                       </thead>
                       <tbody>
-                      {% for worker in project_workers %}
-                        <tr>
-                          <td>{{ worker.first_name }} {{ worker.last_name }}</td>
-                          <td>{{ worker.position }}</td>
-                          <td>{{ worker.phone_number }}</td>
-                        </tr>
-                      {% endfor %}
+                        {% for worker in project_workers %}
+                          <tr>
+                            <td>{{ worker.first_name }} {{ worker.last_name }}</td>
+                            <td>{{ worker.position }}</td>
+                            <td>{{ worker.phone_number }}</td>
+                          </tr>
+                        {% endfor %}
                       </tbody>
                     </table>
                   </dd>
+                {% endif %}
 
-                  <dt class="col-sm-3" style="color: black;">Description:</dt>
-                  <dd class="col-sm-9"
-                      style="color: black;">{{ project.description }}
+                <dt class="col-sm-3">Description:</dt>
+                <dd class="col-sm-9">{{ project.description }}</dd>
+
+                {% if project.budget %}
+                  <dt class="col-sm-3">Budget:</dt>
+                  <dd class="col-sm-9">
+                    <span class="badge rounded-pill bg-success">{{ project.budget }}$</span>
                   </dd>
-                  {% if project.budget %}
-                    <dt class="col-sm-3" style="color: black;">Budget:</dt>
-                    <dd class="col-sm-9" style="color: black;"><span
-                      class="badge rounded-pill bg-success">{{ project.budget }}$</span>
-                  {% endif %}
-                  </dd>
-                </dl>
-                <div
-                    style="display: flex; justify-content: space-between; align-items: center;">
-                  <div>
-                    <p class="h4">Tasks:</p>
-                  </div>
-                  <div>
-                    <a href="{% url "task_manager:project-task-create" pk=project.id %}" class="btn btn-success btn-sm">Add Task</a>
-                  </div>
-                </div>
-                <hr>
-                <!-- Accordion content -->
-                <div class="tab-content" id="ex1-content">
-                  <div class="accordion" id="accordionPanelsStayOpenExample">
-                    {% for task in project_tasks %}
-                      {% include "includes/task_accordion.html" %}
-                    {% endfor %}
-                  </div>
-                </div>
+                {% endif %}
               </dl>
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <p class="h4">Tasks:</p>
+                </div>
+                <div>
+                  <a href="{% url 'task_manager:project-task-create' pk=project.id %}" class="btn btn-dark btn-sm">Add Task</a>
+                </div>
+              </div>
+              <hr>
+              <!-- Accordion content -->
+              <div class="tab-content" id="ex1-content">
+                <div class="accordion" id="accordionPanelsStayOpenExample">
+                  {% for task in project_tasks %}
+                    {% include "includes/task_accordion.html" %}
+                  {% endfor %}
+                </div>
+              </div>
             </div>
           </div>
         </div>

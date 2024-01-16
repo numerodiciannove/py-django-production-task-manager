@@ -1,82 +1,71 @@
 {% extends 'base.html' %}
-{% block content %}
 
+{% block content %}
+  <a href="{% url 'task_manager:project-create' %}" class="d-grid gap-2">
+    <button class="btn btn-dark" type="button">Create project</button>
+  </a>
   <br>
-  <div class="progress" role="progressbar" aria-label="Warning example"
+
+  <div class="progress" role="progressbar" aria-label="Projects completed"
        aria-valuenow="{{ percent_projects_completed }}" aria-valuemin="0"
        aria-valuemax="100">
     <div class="progress-bar bg-warning text-dark"
-         style="width: {{ percent_projects_completed }}%"> {{ percent_projects_completed|floatformat:"0" }}%
+         style="width: {{ percent_projects_completed }}%">{{ percent_projects_completed|floatformat:"0" }}%
       PROJECTS COMPLETED
     </div>
   </div>
   <hr>
+
   <table class="table table-bordered">
     <thead>
     <tr class="text-uppercase">
-      <th scope="col"></th>
-      <th scope="col">Project</th>
-      <th scope="col">Is complete</th>
-      <th scope="col">Tasks</th>
-      <th scope="col">Deadline</th>
-      <th scope="col">Priority</th>
-      <th scope="col">Edit</th>
+      <th></th>
+      <th>Project</th>
+      <th>Is complete</th>
+      <th>Tasks</th>
+      <th>Teams</th>
+      <th>Start</th>
+      <th>Deadline</th>
+      <th>Priority</th>
+      <th>Edit</th>
     </tr>
     </thead>
     <tbody>
     {% for project_info in projects_info %}
       <tr>
         <th scope="row">{{ forloop.counter }}</th>
-        <td><a
-            href="{% url "task_manager:project-detail" pk=project_info.id %}">{{ project_info.project_name }}</a>
-        </td>
+        <td><a href="{% url 'task_manager:project-detail' pk=project_info.id %}">{{ project_info.project_name }}</a></td>
         <td>
-          {% if project_list.forloop.counter0.is_complete %}
-            <i class="bi bi-toggle-on"></i>
-          {% else %}
-            <i class="bi bi-toggle2-off" style="color: #4F6175;"></i>
-          {% endif %}
+          <span class="badge rounded-pill {% if project_info.is_complete %}bg-danger{% else %}bg-success{% endif %}">
+            {% if project_info.is_complete %}Completed{% else %}Active{% endif %}
+          </span>
         </td>
         <td>
           {% for task_name, is_complete in project_info.tasks_info %}
-            <div>
-              {% if is_complete %}
-                <del><i class="bi bi-circle-fill"></i> {{ task_name }}</del>
-              {% else %}
-                <i class="bi bi-circle-fill"></i> {{ task_name }}
-              {% endif %}
-            </div>
+            <div>{% if is_complete %}<del>{% endif %}<i class="bi bi-circle-fill"></i> {{ task_name }}{% if is_complete %}</del>{% endif %}</div>
           {% endfor %}
         </td>
         <td>
-          {% for deadline in project_info.deadlines %}
-            <div>{{ deadline }}</div>
+          {% for team in project_info.teams_info %}
+            <div class="badge rounded-pill bg-success">{{ team }}</div>
           {% endfor %}
         </td>
+        <td>{% for task_start_time in project_info.tasks_start_time %}<div>{{ task_start_time }}</div>{% endfor %}</td>
+        <td>{% for deadline in project_info.deadlines %}<div>{{ deadline }}</div>{% endfor %}</td>
         <td>
           {% for priority in project_info.priorities %}
             <div>
-              {% if priority == "height" %}
-                <span class="badge bg-danger">{{ priority }}</span>
-              {% elif priority == "medium" %}
-                <span class="badge bg-warning text-dark">{{ priority }}</span>
-              {% elif priority == "urgent" %}
-                <span class="badge bg-dark">{{ priority }}</span>
-              {% else %}
-                <span class="badge bg-success">{{ priority }}</span>
-              {% endif %}
+              <span class="badge {% if priority == 'height' %}bg-danger{% elif priority == 'medium' %}bg-warning text-dark{% elif priority == 'urgent' %}bg-dark{% else %}bg-success{% endif %}">{{ priority }}</span>
             </div>
           {% endfor %}
         </td>
         <td class="align-middle">
-          <button type="button" class="btn btn-dark btn-sm">
-            <i class="bi bi-trash3-fill"></i>
-          </button>
-          <button type="button" class="btn btn-dark btn-sm">
-            <i
-                class="bi bi-pencil">
-            </i>
-          </button>
+          <a href="{% url 'task_manager:project-delete' project_id=project_info.id %}">
+            <button type="button" class="btn btn-danger btn-sm"><i class="bi bi-trash3-fill"></i></button>
+          </a>
+          <a href="{% url 'task_manager:project-update' project_id=project_info.id %}">
+            <button type="button" class="btn btn-dark btn-sm"><i class="bi bi-pencil"></i></button>
+          </a>
         </td>
       </tr>
     {% endfor %}

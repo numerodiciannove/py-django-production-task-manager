@@ -1,5 +1,6 @@
 from django import forms
-from task_manager.models import Task
+
+from task_manager.models import Task, Project, Team
 
 
 class ProjectTaskForm(forms.ModelForm):
@@ -34,4 +35,25 @@ class ProjectTaskForm(forms.ModelForm):
         if commit:
             task.save()
         return task
+
+
+class ProjectForm(forms.ModelForm):
+    teams = forms.ModelMultipleChoiceField(
+        queryset=Team.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+    )
+
+    class Meta:
+        model = Project
+        fields = "__all__"
+
+    def save(self, commit=True):
+        project = super().save(commit=False)
+        project.save()
+        project.teams.set(self.cleaned_data['teams'])
+
+        if commit:
+            project.save()
+
+        return project
 

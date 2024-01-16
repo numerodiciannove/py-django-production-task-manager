@@ -85,7 +85,6 @@ class Worker(AbstractUser):
     )
     phone_number = models.CharField(
         max_length=13,
-        unique=True,
         help_text="For example '+380951911919'. Without quotes"
     )
 

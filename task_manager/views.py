@@ -2,7 +2,7 @@ from django.db.models import QuerySet
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views import generic
-from .forms import ProjectTaskForm
+from .forms import ProjectTaskForm, ProjectForm
 from .utils import calculate_percentage
 from task_manager.models import Task, Worker, Project, Team, Position
 
@@ -97,31 +97,50 @@ class ProjectListView(generic.ListView):
             num_completed_projects, num_projects
         )
 
-        context["project_list"] = project_list
+        sorted_project_list = sorted(
+            project_list,
+            key=lambda project: (
+                project.is_complete,
+                project.name,
+            )
+        )
+
+        context["project_list"] = sorted_project_list
         context["percent_projects_completed"] = percent_projects_completed
-        context["projects_info"] = self.get_projects_info(project_list)
+        context["projects_info"] = self.get_project_info(
+            sorted_project_list
+        )
 
         return context
 
     @staticmethod
-    def get_projects_info(project_list) -> list:
-        tasks_info = []
+    def get_project_info(project_list) -> list:
+        project_info = []
         for project in project_list:
-            project_info = {
+            teams_info = project.teams.values_list("name", flat=True)
+            tasks_sorted = sorted(
+                project.tasks.all(),
+                key=lambda task: (
+                    task.is_complete,
+                    task.name,
+                )
+            )
+            project_info.append({
                 "project_name": project.name,
-                "tasks_info": [(task.name, task.is_complete) for task in
-                               project.tasks.all()],
+                "tasks_info": [
+                    (
+                        task.name, task.is_complete
+                    ) for task in tasks_sorted
+                ],
                 "id": project.id,
-                "task_names": [],
-                "deadlines": [],
-                "priorities": []
-            }
-            for task in project.tasks.all():
-                project_info["task_names"].append(task.name)
-                project_info["deadlines"].append(task.deadline)
-                project_info["priorities"].append(task.priority)
-            tasks_info.append(project_info)
-        return tasks_info
+                "task_names": [task.name for task in tasks_sorted],
+                "tasks_start_time": [task.start_time for task in tasks_sorted],
+                "deadlines": [task.deadline for task in tasks_sorted],
+                "priorities": [task.priority for task in tasks_sorted],
+                "is_complete": project.is_complete,
+                "teams_info": list(teams_info),
+            })
+        return project_info
 
 
 class ProjectDetailView(generic.DetailView):
@@ -131,8 +150,16 @@ class ProjectDetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         tasks_list = self.object.tasks.all()
-        context["project_workers"] = self.object.teams.first().workers.all()
         context["project_tasks"] = self.get_tasks_info(tasks_list)
+        team = self.object.teams.first()
+        if team:
+            context["project_workers"] = (
+                self.object.teams.first().workers.all()
+            )
+        else:
+            context["project_workers"] = []
+        context["project_tasks"] = self.get_tasks_info(tasks_list)
+
         return context
 
     @staticmethod
@@ -151,6 +178,52 @@ class ProjectDetailView(generic.DetailView):
             }
             tasks_info.append(task_info)
         return tasks_info
+
+
+class ProjectCreateView(generic.CreateView):
+    model = Project
+    form_class = ProjectForm
+    template_name = 'task_manager/projects/project_create_update.html'
+    success_url = reverse_lazy("task_manager:projects-list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["name"] = "update" if self.object else "create"
+        return context
+
+
+class ProjectUpdateView(generic.UpdateView):
+    model = Project
+    form_class = ProjectForm
+    template_name = 'task_manager/projects/project_create_update.html'
+    context_object_name = 'project'
+
+    def get_success_url(self):
+        return reverse_lazy('task_manager:projects-list', )
+
+    def get_object(self, queryset=None):
+        project_id = self.kwargs.get('project_id')
+        project = get_object_or_404(Project, id=project_id)
+        return project
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["name"] = "update" if self.object else "create"
+        return context
+
+
+class ProjectDeleteView(generic.DeleteView):
+    model = Project
+    template_name = 'task_manager/projects/project_delete.html'
+    context_object_name = 'project'
+
+    def get_success_url(self):
+        return reverse_lazy('task_manager:projects-list', )
+
+    def get_object(self, queryset=None):
+        project_id = self.kwargs.get('project_id')
+        project = get_object_or_404(Project, id=project_id)
+        return project
 
 
 def project_task_create(request, pk):
