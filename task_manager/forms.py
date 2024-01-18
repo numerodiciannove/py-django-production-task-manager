@@ -23,7 +23,7 @@ class ProjectTaskForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        super(ProjectTaskForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if 'instance' in kwargs and kwargs['instance']:
             self.fields['project'].initial = kwargs['instance'].project
 
@@ -61,7 +61,6 @@ class ProjectForm(forms.ModelForm):
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
-
         fields = [
             'is_complete',
             'name',
@@ -71,7 +70,6 @@ class TaskForm(forms.ModelForm):
             'deadline',
             "project",
             'task_type',
-
         ]
         widgets = {
             "start_time": forms.DateInput(attrs={'type': 'datetime-local'}),
