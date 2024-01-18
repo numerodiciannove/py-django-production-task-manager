@@ -10,42 +10,51 @@
               <div class="d-flex justify-content-between align-items-center">
                 <p class="h2">{{ worker.first_name }} {{ worker.last_name }}</p>
                 <div>
-                  <a href="#" class="btn btn-dark btn-sm"><i
+                  <a href="{% url "task_manager:worker-update" pk=worker.id %}" class="btn btn-dark btn-sm"><i
                       class="bi bi-pencil"></i></a>
-                  <a href="#" class="btn btn-danger btn-sm"><i
+                  <a href="{% url "task_manager:worker-delete" pk=worker.id %}" class="btn btn-danger btn-sm"><i
                       class="bi bi-trash3-fill"></i></a>
                 </div>
               </div>
               <dl class="row" style="color: black;">
                 <dt class="col-sm-3">Email:</dt>
-                <dd class="col-sm-9">{{ worker.email }}</dd>
-
-                <dt class="col-sm-3">Phone Number:</dt>
-                <dd class="col-sm-9">
-                  <span class="badge bg-dark">{{ worker.phone_number }}</span>
-                </dd>
-
-                <dt class="col-sm-3">Country:</dt>
-                <dd class="col-sm-9">
-                  <span class="badge bg-dark">{{ worker.country }}</span>
-                </dd>
-
-                <dt class="col-sm-3">Position:</dt>
-                <dd class="col-sm-9">
-                  <span class="badge bg-dark">{{ worker.position }}</span>
-                </dd>
-                <dt class="col-sm-3">Teams:</dt>
-                <dd class="col-sm-9">
-                  {% if worker.teams %}
-                    {% for team in worker.teams.all %}
-                      <div>
-                        <a href="#">{{ team.name }}</a>
-                      </div>
-                    {% endfor %}
-                  {% else %}
-                    <span class="badge rounded-pill bg-warning">No Teams</span>
-                  {% endif %}
-                </dd>
+                {% if worker.email %}
+                  <dd class="col-sm-9">{{ worker.email }}</dd>
+                {% endif %}
+                {% if worker.phone_number %}
+                  <dt class="col-sm-3">Phone Number:</dt>
+                  <dd class="col-sm-9">
+                    <span
+                        class="badge bg-dark">{{ worker.phone_number }}</span>
+                  </dd>
+                {% endif %}
+                {% if worker.country %}
+                  <dt class="col-sm-3">Country:</dt>
+                  <dd class="col-sm-9">
+                    <span class="badge bg-dark">{{ worker.country }}</span>
+                  </dd>
+                {% endif %}
+                {% if worker.position %}
+                  <dt class="col-sm-3">Position:</dt>
+                  <dd class="col-sm-9">
+                    <span class="badge bg-dark">{{ worker.position }}</span>
+                  </dd>
+                {% endif %}
+                {% if worker.teams.all %}
+                  <dt class="col-sm-3">Teams:</dt>
+                  <dd class="col-sm-9">
+                    {% if worker.teams %}
+                      {% for team in worker.teams.all %}
+                        <div>
+                          <a href="#">{{ team.name }}</a>
+                        </div>
+                      {% endfor %}
+                    {% else %}
+                      <span
+                          class="badge rounded-pill bg-warning">No Teams</span>
+                    {% endif %}
+                  </dd>
+                {% endif %}
                 <dt class="col-sm-3">Projects:</dt>
                 <dd class="col-sm-9">
                   {% if projects %}
