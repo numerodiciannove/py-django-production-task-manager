@@ -18,6 +18,7 @@
               {{ form|crispy }}
               <div class="d-grid gap-2">
                 <input type="submit" value="{% if name == 'update' %}Update{% else %}Create{% endif %}" class="btn btn-success">
+                <a href="#" onclick="goBack()" class="btn btn-secondary">Cancel</a>
               </div>
             </form>
           </div>
@@ -25,4 +26,10 @@
       </div>
     </div>
   </div>
+
+  <script>
+    function goBack() {
+      window.history.back();
+    }
+  </script>
 {% endblock %}
