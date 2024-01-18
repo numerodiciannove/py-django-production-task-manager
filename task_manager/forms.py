@@ -1,5 +1,4 @@
 from django import forms
-
 from task_manager.models import Task, Project, Team
 
 
@@ -7,6 +6,7 @@ class ProjectTaskForm(forms.ModelForm):
     class Meta:
         model = Task
         fields = [
+            "is_complete",
             'name',
             'description',
             'start_time',
@@ -57,3 +57,24 @@ class ProjectForm(forms.ModelForm):
 
         return project
 
+
+class TaskForm(forms.ModelForm):
+    class Meta:
+        model = Task
+
+        fields = [
+            'is_complete',
+            'name',
+            'priority',
+            'description',
+            'start_time',
+            'deadline',
+            "project",
+            'task_type',
+
+        ]
+        widgets = {
+            "start_time": forms.DateInput(attrs={'type': 'datetime-local'}),
+            'deadline': forms.DateInput(attrs={'type': 'datetime-local'}),
+            "task_type": forms.CheckboxSelectMultiple()
+        }
