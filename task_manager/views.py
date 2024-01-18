@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views import generic
-from .forms import ProjectTaskForm, ProjectForm, TaskForm
+from .forms import ProjectTaskForm, ProjectForm, TaskForm, WorkerForm
 from .utils import calculate_percentage
 from task_manager.models import Task, Worker, Project, Team, Position
 
@@ -420,4 +420,34 @@ class WorkerDetailView(generic.DetailView):
 
         context["projects"] = projects
         context["tasks_in_projects"] = tasks_in_projects
+        return context
+
+
+class WorkerCreateView(generic.CreateView):
+    model = Worker
+    form_class = WorkerForm
+    template_name = 'task_manager/workers/worker_create_update.html'
+    success_url = reverse_lazy("task_manager:workers-list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["name"] = "update" if self.object else "create"
+        return context
+
+
+class WorkerDeleteView(generic.DeleteView):
+    model = Worker
+    template_name = 'task_manager/workers/worker_delete.html'
+    success_url = reverse_lazy("task_manager:workers-list")
+
+
+class WorkerUpdateView(generic.UpdateView):
+    model = Worker
+    form_class = WorkerForm
+    template_name = 'task_manager/workers/worker_create_update.html'
+    success_url = reverse_lazy("task_manager:workers-list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["name"] = "update" if self.object else "create"
         return context
