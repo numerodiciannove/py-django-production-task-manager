@@ -1,5 +1,3 @@
-from django.utils import timezone as tz
-from django.db.models import QuerySet
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views import generic
@@ -85,9 +83,6 @@ class ProjectListView(generic.ListView):
     context_object_name = "project_list"
     template_name = "task_manager/projects/projects_list.html"
 
-    def get_queryset(self) -> QuerySet[Project]:
-        return Project.objects.all()
-
     def get_context_data(self, **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
         project_list = Project.objects.prefetch_related("tasks").all()
@@ -156,14 +151,9 @@ class ProjectDetailView(generic.DetailView):
         context = super().get_context_data(**kwargs)
         tasks_list = self.object.tasks.all()
         context["project_tasks"] = self.get_tasks_info(tasks_list)
+
         team = self.object.teams.first()
-        if team:
-            context["project_workers"] = (
-                self.object.teams.first().workers.all()
-            )
-        else:
-            context["project_workers"] = []
-        context["project_tasks"] = self.get_tasks_info(tasks_list)
+        context["project_workers"] = team.workers.all() if team else []
 
         return context
 
@@ -333,9 +323,11 @@ class TaskListView(generic.ListView):
 class TaskDetailView(generic.DetailView):
     model = Task
     template_name = 'task_manager/tasks/task_detail.html'
-    queryset = Task.objects.prefetch_related(
-        'project__teams', 'project__teams__workers'
-    ).all()
+
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related(
+            'project__teams', 'project__teams__workers'
+        ).all()
 
 
 class TaskDeleteView(generic.DeleteView):
@@ -365,4 +357,67 @@ class TaskCreateView(generic.CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["name"] = "update" if self.object else "create"
+        return context
+
+
+class WorkerListView(generic.ListView):
+    model = Worker
+    context_object_name = "worker_list"
+    template_name = "task_manager/workers/workers_list.html"
+
+    def get_queryset(self):
+        return Worker.objects.order_by(
+            'first_name', 'last_name',
+        ).prefetch_related(
+            'teams__projects', 'teams',
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        workers_list = self.get_queryset()
+        positions_names = workers_list.values_list(
+            'position__name', flat=True
+        ).distinct()
+        workers_info = []
+
+        for worker in workers_list:
+            worker_projects_list = worker.teams.all().values_list(
+                'projects__name', 'projects__id'
+            )
+            worker_projects = [
+                {'name': name, 'id': id} for name, id in worker_projects_list
+            ]
+            worker_teams = worker.teams.values_list('name', flat=True)
+            workers_info.append({
+                "projects": worker_projects,
+                "phone_number": worker.phone_number,
+                "email": worker.email,
+                "position": worker.position.name if worker.position else None,
+                "country": worker.country,
+                "first_name": worker.first_name,
+                "last_name": worker.last_name,
+                "id": worker.id,
+                "teams": list(worker_teams)
+            })
+
+        context["workers_list"] = workers_list
+        context["positions_names"] = positions_names
+        context["workers_info"] = workers_info
+
+        return context
+
+
+class WorkerDetailView(generic.DetailView):
+    model = Worker
+    context_object_name = "worker"
+    template_name = "task_manager/workers/worker_detail.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        worker = self.get_object()
+        projects = Project.objects.filter(teams__workers=worker).distinct()
+        tasks_in_projects = Task.objects.filter(project__in=projects)
+
+        context["projects"] = projects
+        context["tasks_in_projects"] = tasks_in_projects
         return context
