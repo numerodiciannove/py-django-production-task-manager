@@ -45,7 +45,7 @@
       <tr class="{% if task.is_complete %}complete-task{% else %}incomplete-task{% endif %}">
         <th scope="row">{{ forloop.parentloop.counter }}</th>
         <td>
-          <a href="{% url 'task_manager:tasks-detail' pk=task.id %}">
+          <a href="{% url 'task_manager:task-detail' pk=task.id %}">
             {{ task.name }}
           </a>
         </td>

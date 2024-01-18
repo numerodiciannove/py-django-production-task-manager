@@ -65,7 +65,7 @@
                     <ul>
                       {% for task in tasks_in_projects %}
                         <li>
-                          <a href="{% url "task_manager:tasks-detail" pk=task.id %}">
+                          <a href="{% url "task_manager:task-detail" pk=task.id %}">
                             {% if task.is_complete %}
                               <span class="text-danger"
                                     style="text-decoration: line-through;">{{ task.name }}</span>

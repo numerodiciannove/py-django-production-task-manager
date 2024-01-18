@@ -74,7 +74,7 @@
               {% else %}
                 <i class="bi bi-circle-fill text-success"></i>
               {% endif %}
-              <a href="{% url 'task_manager:tasks-detail' pk=task_info.task_id %}">
+              <a href="{% url 'task_manager:task-detail' pk=task_info.task_id %}">
                 {{ task_info.task_name }}
               </a>
               {% if task_info.is_complete %}
