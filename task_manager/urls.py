@@ -11,11 +11,45 @@ from task_manager.views import (
     ProjectCreateView,
     ProjectDeleteView,
     ProjectUpdateView,
+    TaskListView,
+    TaskDetailView,
+    TaskDeleteView,
+    TaskUpdateView,
+    TaskCreateView,
 )
+
+
+app_name = "task_manager"
+
 
 urlpatterns = [
                   path(
                       "", index, name="index"
+                  ),
+                  path(
+                      "tasks/",
+                      TaskListView.as_view(),
+                      name="tasks-list",
+                  ),
+                  path(
+                      "task/<int:pk>",
+                      TaskDetailView.as_view(),
+                      name="tasks-detail",
+                  ),
+                  path(
+                      "task/create",
+                      TaskCreateView.as_view(),
+                      name="task-create",
+                  ),
+                  path(
+                      "task/<int:pk>/delete",
+                      TaskDeleteView.as_view(),
+                      name="task-delete",
+                  ),
+                  path(
+                      "task/<int:pk>/update",
+                      TaskUpdateView.as_view(),
+                      name="task-update",
                   ),
                   path(
                       "projects/",
@@ -23,31 +57,32 @@ urlpatterns = [
                       name="projects-list",
                   ),
                   path(
-                      "projects/<int:pk>/",
+                      "project/<int:pk>/",
                       ProjectDetailView.as_view(),
                       name="project-detail"),
                   path(
-                      "projects/create/",
+                      "project/create/",
                       ProjectCreateView.as_view(),
                       name="project-create"),
                   path(
-                      "projects/<int:project_id>/delete/",
+                      "project/<int:pk>/delete/",
                       ProjectDeleteView.as_view(),
                       name="project-delete"),
                   path(
-                      "projects/<int:project_id>/update/",
+                      "project/<int:project_id>/update/",
                       ProjectUpdateView.as_view(),
                       name="project-update"),
-                  path("projects/<int:pk>/create_task/",
+                  path("project/<int:pk>/create_task/",
                        project_task_create, name="project-task-create"
                        ),
-                  path("projects/<int:project_id>/task_update/<int:task_id>/",
+                  path("project/<int:project_id>/task_update/<int:task_id>/",
                        project_task_update, name="project-task-update"),
-                  path('projects/<int:project_id>/delete_task/<int:pk>/',
+                  path('project/<int:project_id>/delete_task/<int:pk>/',
                        ProjectTaskDeleteView.as_view(),
                        name='project-task-delete'
                        ),
               ] + static(settings.STATIC_URL,
                          document_root=settings.STATIC_ROOT)
 
-app_name = "task_manager"
+
+

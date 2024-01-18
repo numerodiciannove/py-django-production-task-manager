@@ -12,7 +12,7 @@
                 <h2>Are you sure you want to delete "{{ task.name }}"?</h2>
                 <div class="d-flex justify-content-center">
                   <input type="submit" value="Confirm" class="btn btn-danger me-2">
-                  <a class="btn btn-secondary" href="{% url 'task_manager:project-detail' pk=task.project.id %}">Cancel</a>
+                  <a class="btn btn-secondary" href="{% url 'task_manager:tasks-list' %}">Cancel</a>
                 </div>
               </form>
             </div>

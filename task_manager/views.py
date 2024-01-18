@@ -1,8 +1,9 @@
+from django.utils import timezone as tz
 from django.db.models import QuerySet
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views import generic
-from .forms import ProjectTaskForm, ProjectForm
+from .forms import ProjectTaskForm, ProjectForm, TaskForm
 from .utils import calculate_percentage
 from task_manager.models import Task, Worker, Project, Team, Position
 
@@ -90,7 +91,8 @@ class ProjectListView(generic.ListView):
     def get_context_data(self, **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
         project_list = Project.objects.prefetch_related("tasks").all()
-        num_completed_projects = project_list.filter(is_complete=True).count()
+        num_completed_projects = project_list.filter(
+            is_complete=True).count()
         num_projects = project_list.count()
 
         percent_projects_completed = calculate_percentage(
@@ -128,13 +130,16 @@ class ProjectListView(generic.ListView):
             project_info.append({
                 "project_name": project.name,
                 "tasks_info": [
-                    (
-                        task.name, task.is_complete
-                    ) for task in tasks_sorted
+                    {
+                        "task_id": task.id,
+                        "task_name": task.name,
+                        "is_complete": task.is_complete
+                    } for task in tasks_sorted
                 ],
                 "id": project.id,
                 "task_names": [task.name for task in tasks_sorted],
-                "tasks_start_time": [task.start_time for task in tasks_sorted],
+                "tasks_start_time": [task.start_time for task in
+                                     tasks_sorted],
                 "deadlines": [task.deadline for task in tasks_sorted],
                 "priorities": [task.priority for task in tasks_sorted],
                 "is_complete": project.is_complete,
@@ -170,9 +175,9 @@ class ProjectDetailView(generic.DetailView):
                 "id": task.id,
                 "name": task.name,
                 "description": task.description,
-                "start_time": task.start_time,
+                "start_time": task.start_time if task.start_time else "-",
                 "is_complete": task.is_complete,
-                "deadline": task.deadline,
+                "deadline": task.deadline if task.deadline else "-",
                 "priority": task.priority,
                 "task_types": task.task_type.all()
             }
@@ -215,15 +220,7 @@ class ProjectUpdateView(generic.UpdateView):
 class ProjectDeleteView(generic.DeleteView):
     model = Project
     template_name = 'task_manager/projects/project_delete.html'
-    context_object_name = 'project'
-
-    def get_success_url(self):
-        return reverse_lazy('task_manager:projects-list', )
-
-    def get_object(self, queryset=None):
-        project_id = self.kwargs.get('project_id')
-        project = get_object_or_404(Project, id=project_id)
-        return project
+    success_url = reverse_lazy("task_manager:projects-list")
 
 
 def project_task_create(request, pk):
@@ -243,7 +240,7 @@ def project_task_create(request, pk):
         form = ProjectTaskForm()
 
     return render(request,
-                  'task_manager/projects/project_task_create_update.html',
+                  'task_manager/tasks/task_create_update.html',
                   {'form': form, 'project': project, "name": "create"}, )
 
 
@@ -260,13 +257,13 @@ def project_task_update(request, project_id, task_id):
         form = ProjectTaskForm(instance=task)
 
     return render(request,
-                  'task_manager/projects/project_task_create_update.html',
+                  'task_manager/tasks/task_create_update.html',
                   {'form': form, 'project': project, "name": "update"})
 
 
 class ProjectTaskDeleteView(generic.DeleteView):
     model = Task
-    template_name = 'task_manager/projects/project_task_delete.html'
+    template_name = 'task_manager/tasks/task_delete.html'
     context_object_name = 'task'
 
     def get_success_url(self):
@@ -280,3 +277,92 @@ class ProjectTaskDeleteView(generic.DeleteView):
         project = get_object_or_404(Project, id=project_id)
         task = get_object_or_404(Task, id=task_id, project=project)
         return task
+
+
+class TaskListView(generic.ListView):
+    model = Task
+    context_object_name = "task_list"
+    template_name = "task_manager/tasks/tasks_list.html"
+
+    def get_queryset(self):
+        return Task.objects.all().order_by('start_time')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        tasks_list = Task.objects.all()
+        num_completed_tasks = tasks_list.filter(is_complete=True).count()
+        num_tasks = tasks_list.count()
+        percent_tasks_completed = calculate_percentage(num_completed_tasks,
+                                                       num_tasks)
+
+        context["percent_tasks_completed"] = percent_tasks_completed
+        context["num_completed_tasks"] = num_completed_tasks
+        context["task_info"] = self.get_task_info(tasks_list)
+
+        return context
+
+    @staticmethod
+    def get_task_info(task_list):
+        task_info = []
+
+        for task in task_list:
+            teams_info = task.project.teams.values_list("name", flat=True)
+            tasks_sorted = sorted(
+                task.project.tasks.all(),
+                key=lambda t: (
+                    t.project,
+                )
+            )
+            task_info.append({
+                "project_name": task.project.name,
+                "project_id": task.project.id,
+                "name": task.name,
+                "task_types": [task_type.name for task_type in
+                               task.task_type.all()],
+                "is_complete": task.is_complete,
+                "id": task.id,
+                "task_names": [t.name for t in tasks_sorted],
+                "task_start_time": task.start_time,
+                "deadlines": task.deadline,
+                "priorities": task.priority,
+                "teams_info": list(teams_info),
+            })
+        return task_info
+
+
+class TaskDetailView(generic.DetailView):
+    model = Task
+    template_name = 'task_manager/tasks/task_detail.html'
+    queryset = Task.objects.prefetch_related(
+        'project__teams', 'project__teams__workers'
+    ).all()
+
+
+class TaskDeleteView(generic.DeleteView):
+    model = Task
+    template_name = 'task_manager/tasks/task_delete.html'
+    success_url = reverse_lazy("task_manager:tasks-list")
+
+
+class TaskUpdateView(generic.UpdateView):
+    model = Task
+    form_class = TaskForm
+    template_name = 'task_manager/tasks/task_create_update.html'
+    success_url = reverse_lazy("task_manager:tasks-list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["name"] = "update" if self.object else "create"
+        return context
+
+
+class TaskCreateView(generic.CreateView):
+    model = Task
+    form_class = TaskForm
+    template_name = 'task_manager/tasks/task_create_update.html'
+    success_url = reverse_lazy("task_manager:tasks-list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["name"] = "update" if self.object else "create"
+        return context

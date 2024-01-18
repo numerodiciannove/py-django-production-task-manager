@@ -8,35 +8,43 @@
           <div class="card flex-grow-1">
             <div class="card-body p-5">
               <div class="d-flex justify-content-between align-items-center">
-                <p class="h2">{{ project.name }}</p>
+                <p class="h2">{{ task.name }}</p>
                 <div>
-                  {% if project.is_complete %}
+                  {% if task.is_complete %}
                     <span class="badge bg-danger">Completed</span>
                   {% else %}
                     <span class="badge bg-success">Active</span>
                   {% endif %}
                 </div>
                 <div>
-                  <a href="{% url 'task_manager:project-update' project_id=project.id %}"
-                     class="btn btn-dark btn-sm"><i
+                  <a href="{% url "task_manager:task-update" pk=task.id %}" class="btn btn-dark btn-sm"><i
                       class="bi bi-pencil"></i></a>
-                  <a href="{% url 'task_manager:project-delete' pk=project.id %}"
-                     class="btn btn-danger btn-sm"><i
+                  <a href="{% url "task_manager:task-delete" pk=task.id %}" class="btn btn-danger btn-sm"><i
                       class="bi bi-trash3-fill"></i></a>
                 </div>
               </div>
               <dl class="row" style="color: black;">
                 <dt class="col-sm-3">Team:</dt>
                 <dd class="col-sm-9">
-                  {% if project.teams.first %}
+                  {% if task.project.teams.first %}
                     <span
-                        class="badge rounded-pill bg-success">{{ project.teams.first.name }}</span>
+                        class="badge rounded-pill bg-success">{{ task.project.teams.first.name }}</span>
                   {% else %}
-                    <span class="badge rounded-pill bg-warning">No Team</span>
+                    <span
+                        class="badge rounded-pill bg-warning">No Team</span>
                   {% endif %}
                 </dd>
-
-                {% if project.teams.first %}
+                <dt class="col-sm-3">Project:</dt>
+                <dd class="col-sm-9">
+                  <span class="badge rounded-pill bg-dark">
+                    {{ task.project }}
+                  </span>
+                </dd>
+                <dt class="col-sm-3">Start Time:</dt>
+                <dd class="col-sm-9">{{ task.start_time }}</dd>
+                <dt class="col-sm-3">Deadline:</dt>
+                <dd class="col-sm-9">{{ task.deadline }}</dd>
+                {% if task.project.teams.first %}
                   <dt class="col-sm-3">Workers:</dt>
                   <dd class="col-sm-9">
                     <table class="table">
@@ -49,7 +57,7 @@
                       </tr>
                       </thead>
                       <tbody>
-                      {% for worker in project_workers %}
+                      {% for worker in task.project.teams.first.workers.all %}
                         <tr>
                           <td>{{ worker.first_name }} {{ worker.last_name }}</td>
                           <td>{{ worker.position }}</td>
@@ -61,36 +69,21 @@
                     </table>
                   </dd>
                 {% endif %}
-
-                <dt class="col-sm-3">Description:</dt>
-                <dd class="col-sm-9">{{ project.description }}</dd>
-
-                {% if project.budget %}
-                  <dt class="col-sm-3">Budget:</dt>
-                  <dd class="col-sm-9">
-                    <span
-                        class="badge rounded-pill bg-success">{{ project.budget }}$</span>
-                  </dd>
-                {% endif %}
-              </dl>
-              <div class="d-flex justify-content-between align-items-center">
-                <div>
-                  <p class="h4">Tasks:</p>
-                </div>
-                <div>
-                  <a href="{% url 'task_manager:project-task-create' pk=project.id %}"
-                     class="btn btn-dark btn-sm">Add Task</a>
-                </div>
-              </div>
-              <hr>
-              <!-- Accordion content -->
-              <div class="tab-content" id="ex1-content">
-                <div class="accordion" id="accordionPanelsStayOpenExample">
-                  {% for task in project_tasks %}
-                    {% include "includes/task_accordion.html" %}
+                <dt class="col-sm-3">Priority:</dt>
+                <dd class="col-sm-9">
+                  <span
+                      class="badge bg-dark">{{ task.get_priority_display }}</span>
+                </dd>
+                <dt class="col-sm-3">Task Type:</dt>
+                <dd class="col-sm-9">
+                  {% for task_type in task.task_type.all %}
+                    <span class="badge bg-dark">{{ task_type.name }}</span>
                   {% endfor %}
-                </div>
-              </div>
+                </dd>
+                <dt class="col-sm-3">Description:</dt>
+                <dd class="col-sm-9">{{ task.description }}</dd>
+              </dl>
+              <hr>
             </div>
           </div>
         </div>
