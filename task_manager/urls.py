@@ -18,6 +18,9 @@ from task_manager.views import (
     TaskCreateView,
     WorkerListView,
     WorkerDetailView,
+    WorkerCreateView,
+    WorkerDeleteView,
+    WorkerUpdateView,
 )
 
 
@@ -36,7 +39,7 @@ urlpatterns = [
                   path(
                       "task/<int:pk>",
                       TaskDetailView.as_view(),
-                      name="tasks-detail",
+                      name="task-detail",
                   ),
                   path(
                       "task/create",
@@ -92,6 +95,18 @@ urlpatterns = [
                       "worker/<int:pk>/",
                       WorkerDetailView.as_view(),
                       name="worker-detail"),
+                  path(
+                      "worker/create/",
+                      WorkerCreateView.as_view(),
+                      name="worker-create"),
+                  path(
+                      "worker/<int:pk>/update/",
+                      WorkerUpdateView.as_view(),
+                      name="worker-update"),
+                  path(
+                      "worker/<int:pk>/delete/",
+                      WorkerDeleteView.as_view(),
+                      name="worker-delete"),
               ] + static(settings.STATIC_URL,
                          document_root=settings.STATIC_ROOT)
 
