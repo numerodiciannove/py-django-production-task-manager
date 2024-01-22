@@ -1,7 +1,14 @@
+from django.db.models import Count
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views import generic
-from .forms import ProjectTaskForm, ProjectForm, TaskForm, WorkerForm
+from .forms import (ProjectTaskForm,
+                    ProjectForm,
+                    TaskForm,
+                    WorkerForm,
+                    TeamForm,
+                    PositionForm
+                    )
 from .utils import calculate_percentage
 from task_manager.models import Task, Worker, Project, Team, Position
 
@@ -114,7 +121,7 @@ class ProjectListView(generic.ListView):
     def get_project_info(project_list) -> list:
         project_info = []
         for project in project_list:
-            teams_info = project.teams.values_list("name", flat=True)
+            teams_info = project.teams.all()
             tasks_sorted = sorted(
                 project.tasks.all(),
                 key=lambda task: (
@@ -296,7 +303,7 @@ class TaskListView(generic.ListView):
         task_info = []
 
         for task in task_list:
-            teams_info = task.project.teams.values_list("name", flat=True)
+            teams_info = task.project.teams.all()
             tasks_sorted = sorted(
                 task.project.tasks.all(),
                 key=lambda t: (
@@ -441,7 +448,7 @@ class WorkerDeleteView(generic.DeleteView):
     success_url = reverse_lazy("task_manager:workers-list")
 
 
-class WorkerUpdateView(generic.UpdateView):
+class WorkerUpdateView(generic.CreateView):
     model = Worker
     form_class = WorkerForm
     template_name = 'task_manager/workers/worker_create_update.html'
@@ -451,3 +458,128 @@ class WorkerUpdateView(generic.UpdateView):
         context = super().get_context_data(**kwargs)
         context["name"] = "update" if self.object else "create"
         return context
+
+
+class TeamListView(generic.ListView):
+    model = Team
+    context_object_name = "team_list"
+    template_name = "task_manager/teams/teams_list.html"
+
+    def get_queryset(self):
+        return Team.objects.annotate(
+            num_projects=Count('projects')
+        ).order_by('-num_projects', 'name')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        teams_list = self.get_queryset()
+        teams_info = []
+
+        for team in teams_list:
+            projects_info = []
+            projects = team.projects.all()
+
+            for project in projects:
+                tasks_info = []
+                tasks = project.tasks.all()
+
+                for task in tasks:
+                    tasks_info.append({
+                        "name": task.name,
+                        "id": task.id,
+                    })
+
+                projects_info.append({
+                    "project_name": project.name,
+                    "project_id": project.id,
+                    "tasks": tasks_info,
+                })
+
+            teams_info.append({
+                "team_name": team.name,
+                "team_id": team.id,
+                "projects": projects_info,
+            })
+
+        context["teams_info"] = teams_info
+        return context
+
+
+class TeamDetailView(generic.DetailView):
+    model = Team
+    context_object_name = "team"
+    template_name = "task_manager/teams/team_detail.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        team = self.get_object()
+        team_members = team.workers.all()
+        team_projects = team.projects.all()
+        context["team_members"] = team_members
+        context["team_projects"] = team_projects
+
+        return context
+
+
+class TeamUpdateView(generic.UpdateView):
+    model = Team
+    form_class = TeamForm
+    template_name = 'task_manager/teams/team_create_update.html'
+    success_url = reverse_lazy("task_manager:teams-list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["name"] = "update" if self.object else "create"
+        return context
+
+
+class TeamCreateView(generic.CreateView):
+    model = Team
+    form_class = TeamForm
+    template_name = 'task_manager/teams/team_create_update.html'
+    success_url = reverse_lazy("task_manager:teams-list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["name"] = "update" if self.object else "create"
+        return context
+
+
+class TeamDeleteView(generic.DeleteView):
+    model = Team
+    template_name = 'task_manager/teams/team_delete.html'
+    success_url = reverse_lazy("task_manager:teams-list")
+
+
+class PositionListView(generic.ListView):
+    model = Position
+    context_object_name = "position_list"
+    template_name = "task_manager/positions/positions_list.html"
+
+    def get_queryset(self):
+        return Position.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        print(context["position_list"])
+        return context
+
+
+class PositionDeleteView(generic.DeleteView):
+    model = Position
+    template_name = 'task_manager/positions/position_delete.html'
+    success_url = reverse_lazy("task_manager:positions-list")
+
+
+class PositionCreateView(generic.CreateView):
+    model = Position
+    form_class = PositionForm
+    template_name = 'task_manager/positions/position_create_update.html'
+    success_url = reverse_lazy("task_manager:positions-list")
+
+
+class PositionUpdateView(generic.UpdateView):
+    model = Position
+    form_class = PositionForm
+    template_name = 'task_manager/positions/position_create_update.html'
+    success_url = reverse_lazy("task_manager:positions-list")

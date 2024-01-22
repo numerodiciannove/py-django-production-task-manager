@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import PasswordInput
 
-from task_manager.models import Task, Project, Team, Worker
+from task_manager.models import Task, Project, Team, Worker, Position
 
 
 class ProjectTaskForm(forms.ModelForm):
@@ -107,3 +107,20 @@ class WorkerForm(forms.ModelForm):
             raise forms.ValidationError("Passwords do not match.")
 
         return cleaned_data
+
+
+class TeamForm(forms.ModelForm):
+    workers = forms.ModelMultipleChoiceField(
+        queryset=Worker.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+    )
+
+    class Meta:
+        model = Team
+        fields = "__all__"
+
+
+class PositionForm(forms.ModelForm):
+    class Meta:
+        model = Position
+        fields = "__all__"

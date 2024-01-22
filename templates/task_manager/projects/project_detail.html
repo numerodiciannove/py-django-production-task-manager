@@ -29,8 +29,8 @@
                 <dt class="col-sm-3">Team:</dt>
                 <dd class="col-sm-9">
                   {% if project.teams.first %}
-                    <span
-                        class="badge rounded-pill bg-success">{{ project.teams.first.name }}</span>
+                    <a href="{% url "task_manager:team-detail" pk=project.teams.first.id %}"
+                        class="badge rounded-pill bg-success">{{ project.teams.first.name }}</a>
                   {% else %}
                     <span class="badge rounded-pill bg-warning">No Team</span>
                   {% endif %}
@@ -51,7 +51,11 @@
                       <tbody>
                       {% for worker in project_workers %}
                         <tr>
-                          <td>{{ worker.first_name }} {{ worker.last_name }}</td>
+                          <td>
+                            <a href="{% url "task_manager:worker-detail" pk=worker.id %}">
+                              {{ worker.first_name }} {{ worker.last_name }}
+                            </a>
+                          </td>
                           <td>{{ worker.position }}</td>
                           <td>{{ worker.country }}</td>
                           <td>{{ worker.phone_number }}</td>

@@ -21,11 +21,18 @@ from task_manager.views import (
     WorkerCreateView,
     WorkerDeleteView,
     WorkerUpdateView,
+    TeamListView,
+    TeamDetailView,
+    TeamUpdateView,
+    TeamCreateView,
+    TeamDeleteView,
+    PositionListView,
+    PositionDeleteView,
+    PositionCreateView,
+    PositionUpdateView,
 )
 
-
 app_name = "task_manager"
-
 
 urlpatterns = [
                   path(
@@ -107,8 +114,43 @@ urlpatterns = [
                       "worker/<int:pk>/delete/",
                       WorkerDeleteView.as_view(),
                       name="worker-delete"),
+                  path(
+                      "teams/",
+                      TeamListView.as_view(),
+                      name="teams-list",
+                  ),
+                  path(
+                      "team/<int:pk>/",
+                      TeamDetailView.as_view(),
+                      name="team-detail"),
+                  path(
+                      "team/<int:pk>/update/",
+                      TeamUpdateView.as_view(),
+                      name="team-update"),
+                  path(
+                      "team/create/",
+                      TeamCreateView.as_view(),
+                      name="team-create"),
+                  path(
+                      "team/<int:pk>/delete/",
+                      TeamDeleteView.as_view(),
+                      name="team-delete"),
+                  path(
+                      "positions/",
+                      PositionListView.as_view(),
+                      name="positions-list",
+                  ),
+                  path(
+                      "position/<int:pk>/delete/",
+                      PositionDeleteView.as_view(),
+                      name="position-delete"),
+                  path(
+                      "position/create/",
+                      PositionCreateView.as_view(),
+                      name="position-create"),
+                  path(
+                      "position/<int:pk>:/update/",
+                      PositionUpdateView.as_view(),
+                      name="position-update"),
               ] + static(settings.STATIC_URL,
                          document_root=settings.STATIC_ROOT)
-
-
-
