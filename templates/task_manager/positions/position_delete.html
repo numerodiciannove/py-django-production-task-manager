@@ -1,5 +1,5 @@
 {% block content %}
-  {% with confirmation_text="Are you sure you want to delete project '"|add:project.name|add:"'?" %}
+  {% with confirmation_text="Are you sure you want to delete '"|add:position.name|add:"'?" %}
     {% include 'includes/delete_confirmation.html' %}
   {% endwith %}
 {% endblock %}
