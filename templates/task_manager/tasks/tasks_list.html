@@ -14,17 +14,18 @@
     </div>
   </div>
   <hr>
+  <section class="section_table_tasks">
   <div class="btn-group" role="group" aria-label="Task Filters">
-    <button type="button" class="btn btn-dark" id="filterIncomplete">Incomplete
-      Tasks
+    <button type="button" class="btn btn-dark" id="filterIncomplete" data-status="incomplete-task">
+      Incomplete Tasks
     </button>
-    <button type="button" class="btn btn-dark" id="filterComplete">Complete
-      Tasks
+    <button type="button" class="btn btn-dark" id="filterComplete" data-status="complete-task">
+      Complete Tasks
     </button>
-    <button type="button" class="btn btn-dark" id="filterAll">All Tasks
+    <button type="button" class="btn btn-secondary" id="filterAll"  data-status="all">
+      All Tasks
     </button>
   </div>
-
   <table class="table table-bordered mt-4" id="taskTable">
     <thead>
     <tr class="text-uppercase">
@@ -46,6 +47,7 @@
         <th scope="row">{{ forloop.parentloop.counter }}</th>
         <td>
           <a href="{% url 'task_manager:task-detail' pk=task.id %}">
+            <span class="bi bi-star-fill"></span>
             {{ task.name }}
           </a>
         </td>
@@ -66,7 +68,7 @@
         </td>
         <td>
           {% for team_info in task.teams_info %}
-            <span class="badge bg-secondary">{{ team_info }}</span>
+            <a href="{% url "task_manager:team-detail" pk=team_info.id %}" class="badge bg-secondary">{{ team_info }}</a>
             {% if not forloop.last %} {% endif %}
           {% endfor %}
         </td>
@@ -92,6 +94,5 @@
     {% endfor %}
     </tbody>
   </table>
-  {% load static %}
-  <script src="{% static 'js/task_list.js' %}"></script>
+   </section>
 {% endblock %}
