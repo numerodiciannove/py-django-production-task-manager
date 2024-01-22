@@ -26,6 +26,7 @@
         <th scope="row">{{ forloop.counter }}</th>
         <td>
           <a href="{% url "task_manager:worker-detail" pk=worker_info.id %}">
+            <span class="bi bi-people-fill"></span>
             {{ worker_info.first_name }} {{ worker_info.last_name }}
           </a>
         </td>
