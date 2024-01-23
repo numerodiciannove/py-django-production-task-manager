@@ -30,7 +30,7 @@
                 <dd class="col-sm-9">
                   {% if project.teams.first %}
                     <a href="{% url "task_manager:team-detail" pk=project.teams.first.id %}"
-                        class="badge rounded-pill bg-success">{{ project.teams.first.name }}</a>
+                       class="badge rounded-pill bg-success">{{ project.teams.first.name }}</a>
                   {% else %}
                     <span class="badge rounded-pill bg-warning">No Team</span>
                   {% endif %}
@@ -65,10 +65,8 @@
                     </table>
                   </dd>
                 {% endif %}
-
                 <dt class="col-sm-3">Description:</dt>
                 <dd class="col-sm-9">{{ project.description }}</dd>
-
                 {% if project.budget %}
                   <dt class="col-sm-3">Budget:</dt>
                   <dd class="col-sm-9">
@@ -87,7 +85,6 @@
                 </div>
               </div>
               <hr>
-              <!-- Accordion content -->
               <div class="tab-content" id="ex1-content">
                 <div class="accordion" id="accordionPanelsStayOpenExample">
                   {% for task in project_tasks %}

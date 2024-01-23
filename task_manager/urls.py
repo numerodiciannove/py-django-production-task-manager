@@ -35,9 +35,7 @@ from task_manager.views import (
 app_name = "task_manager"
 
 urlpatterns = [
-                  path(
-                      "", index, name="index"
-                  ),
+                  path("", index, name="index"),
                   path(
                       "tasks/",
                       TaskListView.as_view(),
@@ -71,70 +69,59 @@ urlpatterns = [
                   path(
                       "project/<int:pk>/",
                       ProjectDetailView.as_view(),
-                      name="project-detail"),
+                      name="project-detail"
+                  ),
+                  path("project/create/", ProjectCreateView.as_view(),
+                       name="project-create"),
                   path(
-                      "project/create/",
-                      ProjectCreateView.as_view(),
-                      name="project-create"),
-                  path(
-                      "project/<int:pk>/delete/",
-                      ProjectDeleteView.as_view(),
-                      name="project-delete"),
+                      "project/<int:pk>/delete/", ProjectDeleteView.as_view(),
+                      name="project-delete"
+                  ),
                   path(
                       "project/<int:project_id>/update/",
                       ProjectUpdateView.as_view(),
-                      name="project-update"),
-                  path("project/<int:pk>/create_task/",
-                       project_task_create, name="project-task-create"
-                       ),
-                  path("project/<int:project_id>/task_update/<int:task_id>/",
-                       project_task_update, name="project-task-update"),
-                  path('project/<int:project_id>/delete_task/<int:pk>/',
-                       ProjectTaskDeleteView.as_view(),
-                       name='project-task-delete'
-                       ),
+                      name="project-update",
+                  ),
+                  path(
+                      "project/<int:pk>/create_task/", project_task_create,
+                      name="project-task-create"
+                  ),
+                  path(
+                      "project/<int:project_id>/task_update/<int:task_id>/",
+                      project_task_update,
+                      name="project-task-update",
+                  ),
+                  path(
+                      "project/<int:project_id>/delete_task/<int:pk>/",
+                      ProjectTaskDeleteView.as_view(),
+                      name="project-task-delete",
+                  ),
                   path(
                       "workers/",
                       WorkerListView.as_view(),
                       name="workers-list",
                   ),
-                  path(
-                      "worker/<int:pk>/",
-                      WorkerDetailView.as_view(),
-                      name="worker-detail"),
-                  path(
-                      "worker/create/",
-                      WorkerCreateView.as_view(),
-                      name="worker-create"),
-                  path(
-                      "worker/<int:pk>/update/",
-                      WorkerUpdateView.as_view(),
-                      name="worker-update"),
-                  path(
-                      "worker/<int:pk>/delete/",
-                      WorkerDeleteView.as_view(),
-                      name="worker-delete"),
+                  path("worker/<int:pk>/", WorkerDetailView.as_view(),
+                       name="worker-detail"),
+                  path("worker/create/", WorkerCreateView.as_view(),
+                       name="worker-create"),
+                  path("worker/<int:pk>/update/", WorkerUpdateView.as_view(),
+                       name="worker-update"),
+                  path("worker/<int:pk>/delete/", WorkerDeleteView.as_view(),
+                       name="worker-delete"),
                   path(
                       "teams/",
                       TeamListView.as_view(),
                       name="teams-list",
                   ),
-                  path(
-                      "team/<int:pk>/",
-                      TeamDetailView.as_view(),
-                      name="team-detail"),
-                  path(
-                      "team/<int:pk>/update/",
-                      TeamUpdateView.as_view(),
-                      name="team-update"),
-                  path(
-                      "team/create/",
-                      TeamCreateView.as_view(),
-                      name="team-create"),
-                  path(
-                      "team/<int:pk>/delete/",
-                      TeamDeleteView.as_view(),
-                      name="team-delete"),
+                  path("team/<int:pk>/", TeamDetailView.as_view(),
+                       name="team-detail"),
+                  path("team/<int:pk>/update/", TeamUpdateView.as_view(),
+                       name="team-update"),
+                  path("team/create/", TeamCreateView.as_view(),
+                       name="team-create"),
+                  path("team/<int:pk>/delete/", TeamDeleteView.as_view(),
+                       name="team-delete"),
                   path(
                       "positions/",
                       PositionListView.as_view(),
@@ -143,15 +130,15 @@ urlpatterns = [
                   path(
                       "position/<int:pk>/delete/",
                       PositionDeleteView.as_view(),
-                      name="position-delete"),
-                  path(
-                      "position/create/",
-                      PositionCreateView.as_view(),
-                      name="position-create"),
+                      name="position-delete",
+                  ),
+                  path("position/create/", PositionCreateView.as_view(),
+                       name="position-create"),
                   path(
                       "position/<int:pk>:/update/",
                       PositionUpdateView.as_view(),
-                      name="position-update"),
-                  path('accounts/', include('django.contrib.auth.urls')),
+                      name="position-update",
+                  ),
+                  path("accounts/", include("django.contrib.auth.urls")),
               ] + static(settings.STATIC_URL,
                          document_root=settings.STATIC_ROOT)

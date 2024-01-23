@@ -8,9 +8,13 @@
         <div class="col-xl-10 mx-auto d-flex flex-column h-100">
           <div class="card flex-grow-1 p-3">
             {% if name == "update" %}
-              <h1>Update project:</h1>
+              <h1>
+                Update project:
+              </h1>
             {% else %}
-              <h1>Create project:</h1>
+              <h1>
+                Create project:
+              </h1>
             {% endif %}
             <hr>
             <form action="" method="post" novalidate>
@@ -18,7 +22,9 @@
               {{ form|crispy }}
               <div class="d-grid gap-2">
                 <input type="submit" value="{% if name == 'update' %}Update{% else %}Create{% endif %}" class="btn btn-success">
-                <a href="#" onclick="goBack()" class="btn btn-secondary">Cancel</a>
+                <a href="#" onclick="goBack()" class="btn btn-secondary">
+                  Cancel
+                </a>
               </div>
             </form>
           </div>

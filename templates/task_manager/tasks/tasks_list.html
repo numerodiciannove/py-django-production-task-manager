@@ -15,84 +15,88 @@
   </div>
   <hr>
   <section class="section_table_tasks">
-  <div class="btn-group" role="group" aria-label="Task Filters">
-    <button type="button" class="btn btn-dark" id="filterIncomplete" data-status="incomplete-task">
-      Incomplete Tasks
-    </button>
-    <button type="button" class="btn btn-dark" id="filterComplete" data-status="complete-task">
-      Complete Tasks
-    </button>
-    <button type="button" class="btn btn-secondary" id="filterAll"  data-status="all">
-      All Tasks
-    </button>
-  </div>
-  <table class="table table-bordered mt-4" id="taskTable">
-    <thead>
-    <tr class="text-uppercase">
-      <th></th>
-      <th>Tasks</th>
-      <th>Complete</th>
-      <th>Task type</th>
-      <th>Project</th>
-      <th>Teams</th>
-      <th>Start</th>
-      <th>Deadline</th>
-      <th>Priority</th>
-      <th>Edit</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for task in task_info %}
-      <tr class="{% if task.is_complete %}complete-task{% else %}incomplete-task{% endif %}">
-        <th scope="row">{{ forloop.parentloop.counter }}</th>
-        <td>
-          <a href="{% url 'task_manager:task-detail' pk=task.id %}">
-            <span class="bi bi-star-fill"></span>
-            {{ task.name }}
-          </a>
-        </td>
-        <td>
+    <div class="btn-group" role="group" aria-label="Task Filters">
+      <button type="button" class="btn btn-dark" id="filterIncomplete"
+              data-status="incomplete-task">
+        Incomplete Tasks
+      </button>
+      <button type="button" class="btn btn-dark" id="filterComplete"
+              data-status="complete-task">
+        Complete Tasks
+      </button>
+      <button type="button" class="btn btn-secondary" id="filterAll"
+              data-status="all">
+        All Tasks
+      </button>
+    </div>
+    <table class="table table-bordered mt-4" id="taskTable">
+      <thead>
+      <tr class="text-uppercase">
+        <th></th>
+        <th>Tasks</th>
+        <th>Complete</th>
+        <th>Task type</th>
+        <th>Project</th>
+        <th>Teams</th>
+        <th>Start</th>
+        <th>Deadline</th>
+        <th>Priority</th>
+        <th>Edit</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for task in task_info %}
+        <tr class="{% if task.is_complete %}complete-task{% else %}incomplete-task{% endif %}">
+          <th scope="row">{{ forloop.parentloop.counter }}</th>
+          <td>
+            <a href="{% url 'task_manager:task-detail' pk=task.id %}">
+              <span class="bi bi-star-fill"></span>
+              {{ task.name }}
+            </a>
+          </td>
+          <td>
         <span
             class="badge rounded-pill {% if task.is_complete %} bg-danger {% else %} bg-success {% endif %}">
           {% if task.is_complete %}Completed{% else %}Active{% endif %}
         </span>
-        </td>
-        <td>
-          {% for task_type in task.task_types %}
-            <span class="badge bg-secondary">{{ task_type }}</span>
-            {% if not forloop.last %} {% endif %}
-          {% endfor %}
-        </td>
-        <td>
-          <a href="{% url "task_manager:project-detail" pk=task.project_id %}">{{ task.project_name }}</a>
-        </td>
-        <td>
-          {% for team_info in task.teams_info %}
-            <a href="{% url "task_manager:team-detail" pk=team_info.id %}" class="badge bg-secondary">{{ team_info }}</a>
-            {% if not forloop.last %} {% endif %}
-          {% endfor %}
-        </td>
-        <td>{{ task.task_start_time }}</td>
-        <td>{{ task.deadlines }}</td>
-        <td>
+          </td>
+          <td>
+            {% for task_type in task.task_types %}
+              <span class="badge bg-secondary">{{ task_type }}</span>
+              {% if not forloop.last %} {% endif %}
+            {% endfor %}
+          </td>
+          <td>
+            <a href="{% url "task_manager:project-detail" pk=task.project_id %}">{{ task.project_name }}</a>
+          </td>
+          <td>
+            {% for team_info in task.teams_info %}
+              <a href="{% url "task_manager:team-detail" pk=team_info.id %}"
+                 class="badge bg-secondary">{{ team_info }}</a>
+              {% if not forloop.last %} {% endif %}
+            {% endfor %}
+          </td>
+          <td>{{ task.task_start_time }}</td>
+          <td>{{ task.deadlines }}</td>
+          <td>
           <span
               class="badge {% if task.priorities == 'urgent' %}bg-danger{% elif task.priorities == 'height' %}bg-warning{% elif task.priorities == 'medium' %}bg-info{% elif task.priorities == 'low' %}bg-success{% endif %}">
             {{ task.priorities }}
           </span>
-        </td>
-        <td class="align-middle">
-          <a href="{% url "task_manager:task-delete" pk=task.id %}">
-            <button type="button" class="btn btn-danger btn-sm"><i
-                class="bi bi-trash3-fill"></i></button>
-          </a>
-          <a href="{% url "task_manager:task-update" pk=task.id %}">
-            <button type="button" class="btn btn-dark btn-sm"><i
-                class="bi bi-pencil"></i></button>
-          </a>
-        </td>
-      </tr>
-    {% endfor %}
-    </tbody>
-  </table>
-   </section>
+          </td>
+          <td class="align-middle">
+            <a href="{% url "task_manager:task-delete" pk=task.id %}">
+              <button type="button" class="btn btn-danger btn-sm"><i
+                  class="bi bi-trash3-fill"></i></button>
+            </a>
+            <a href="{% url "task_manager:task-update" pk=task.id %}">
+              <button type="button" class="btn btn-dark btn-sm"><i
+                  class="bi bi-pencil"></i></button>
+            </a>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </section>
 {% endblock %}

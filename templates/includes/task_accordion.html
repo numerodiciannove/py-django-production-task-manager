@@ -10,8 +10,12 @@
              aria-expanded="false"
              aria-controls="flush-collapse{{ task.id }}">
           {% if task.is_complete %}
-            <del style="color: darkred"><i class="bi bi-list-task me-2"></i><i
-                class="bi bi-check-lg"></i>{{ task.name }}</del>
+            <del style="color: darkred">
+              <i class="bi bi-list-task me-2"></i>
+              <i class="bi bi-check-lg">
+              </i>
+              {{ task.name }}
+            </del>
           {% else %}
             <i class="bi bi-list-task me-2"></i>
             {{ task.name }}
@@ -31,8 +35,6 @@
       </div>
     </div>
   </h2>
-
-
   <div id="flush-collapse{{ task.id }}" class="accordion-collapse collapse"
        aria-labelledby="flush-heading{{ task.id }}"
        data-bs-parent="#accordionFlushExample">

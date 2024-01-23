@@ -10,7 +10,9 @@ class Project(models.Model):
     budget = models.IntegerField(null=True, blank=True)
 
     class Meta:
-        ordering = ["name", ]
+        ordering = [
+            "name",
+        ]
 
     def __str__(self):
         return self.name
@@ -22,7 +24,9 @@ class TaskType(models.Model):
     )
 
     class Meta:
-        ordering = ["name", ]
+        ordering = [
+            "name",
+        ]
 
     def __str__(self):
         return self.name
@@ -35,7 +39,9 @@ class Task(models.Model):
         ("medium", "Medium"),
         ("low", "Low"),
     ]
-    name = models.CharField(max_length=255, )
+    name = models.CharField(
+        max_length=255,
+    )
     description = models.TextField(null=True, blank=True)
     start_time = models.DateTimeField(null=True, blank=True)
     deadline = models.DateTimeField(null=True, blank=True)
@@ -53,13 +59,12 @@ class Task(models.Model):
         null=True,
         blank=True,
     )
-    task_type = models.ManyToManyField(
-        TaskType,
-        related_name="tasks"
-    )
+    task_type = models.ManyToManyField(TaskType, related_name="tasks")
 
     class Meta:
-        ordering = ["name", ]
+        ordering = [
+            "name",
+        ]
 
     def __str__(self):
         return self.name
@@ -67,11 +72,14 @@ class Task(models.Model):
 
 class Position(models.Model):
     name = models.CharField(
-        max_length=100, unique=True,
+        max_length=100,
+        unique=True,
     )
 
     class Meta:
-        ordering = ["name", ]
+        ordering = [
+            "name",
+        ]
 
     def __str__(self):
         return self.name
@@ -85,13 +93,14 @@ class Worker(AbstractUser):
         blank=True,
     )
     phone_number = models.CharField(
-        max_length=13,
-        help_text="For example '+380951911919'. Without quotes"
+        max_length=13, help_text="For example '+380951911919'. Without quotes"
     )
     country = CountryField(blank=True)
 
     class Meta:
-        ordering = ["position", ]
+        ordering = [
+            "position",
+        ]
 
     def __str__(self):
         return (
@@ -115,7 +124,9 @@ class Team(models.Model):
     )
 
     class Meta:
-        ordering = ["name", ]
+        ordering = [
+            "name",
+        ]
 
     def __str__(self):
         return self.name

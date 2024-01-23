@@ -9,30 +9,30 @@ class ProjectTaskForm(forms.ModelForm):
         model = Task
         fields = [
             "is_complete",
-            'name',
-            'description',
-            'start_time',
-            'deadline',
-            'priority',
-            'task_type',
-            "project"
+            "name",
+            "description",
+            "start_time",
+            "deadline",
+            "priority",
+            "task_type",
+            "project",
         ]
         widgets = {
-            'project': forms.HiddenInput(),
-            "start_time": forms.DateInput(attrs={'type': 'datetime-local'}),
-            'deadline': forms.DateInput(attrs={'type': 'datetime-local'}),
-            "task_type": forms.CheckboxSelectMultiple()
+            "project": forms.HiddenInput(),
+            "start_time": forms.DateInput(attrs={"type": "datetime-local"}),
+            "deadline": forms.DateInput(attrs={"type": "datetime-local"}),
+            "task_type": forms.CheckboxSelectMultiple(),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if 'instance' in kwargs and kwargs['instance']:
-            self.fields['project'].initial = kwargs['instance'].project
+        if "instance" in kwargs and kwargs["instance"]:
+            self.fields["project"].initial = kwargs["instance"].project
 
     def save(self, commit=True):
         task = super().save(commit=False)
         task.save()
-        task.task_type.set(self.cleaned_data['task_type'])
+        task.task_type.set(self.cleaned_data["task_type"])
 
         if commit:
             task.save()
@@ -52,7 +52,7 @@ class ProjectForm(forms.ModelForm):
     def save(self, commit=True):
         project = super().save(commit=False)
         project.save()
-        project.teams.set(self.cleaned_data['teams'])
+        project.teams.set(self.cleaned_data["teams"])
 
         if commit:
             project.save()
@@ -64,19 +64,19 @@ class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
         fields = [
-            'is_complete',
-            'name',
-            'priority',
-            'description',
-            'start_time',
-            'deadline',
+            "is_complete",
+            "name",
+            "priority",
+            "description",
+            "start_time",
+            "deadline",
             "project",
-            'task_type',
+            "task_type",
         ]
         widgets = {
-            "start_time": forms.DateInput(attrs={'type': 'datetime-local'}),
-            'deadline': forms.DateInput(attrs={'type': 'datetime-local'}),
-            "task_type": forms.CheckboxSelectMultiple()
+            "start_time": forms.DateInput(attrs={"type": "datetime-local"}),
+            "deadline": forms.DateInput(attrs={"type": "datetime-local"}),
+            "task_type": forms.CheckboxSelectMultiple(),
         }
 
 
@@ -132,10 +132,10 @@ class WorkerSearchForm(forms.Form):
         required=False,
         widget=forms.TextInput(
             attrs={
-                "placeholder":
-                    "Search: For example, Terry Richardson. "
-                    "Another enter just the First Name or Last Name."
-            })
+                "placeholder": "Search: For example, Terry Richardson. "
+                "Another enter just the First Name or Last Name."
+            }
+        ),
     )
 
 
@@ -143,12 +143,7 @@ class TeamSearchForm(forms.Form):
     search_by_team_name = forms.CharField(
         label="",
         required=False,
-        widget=forms.TextInput(
-            attrs={
-                "placeholder":
-                    "Search: by team name"
-            }
-        )
+        widget=forms.TextInput(attrs={"placeholder": "Search: by team name"}),
     )
 
 
@@ -157,9 +152,6 @@ class PositionSearchForm(forms.Form):
         label="",
         required=False,
         widget=forms.TextInput(
-            attrs={
-                "placeholder":
-                    "Search: by position name"
-            }
-        )
+            attrs={"placeholder": "Search: by position name"}
+        ),
     )

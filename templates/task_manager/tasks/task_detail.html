@@ -30,7 +30,7 @@
                 <dd class="col-sm-9">
                   {% if task.project.teams.first %}
                     <a href="{% url "task_manager:team-detail" pk=task.project.teams.first.id %}"
-                        class="badge rounded-pill bg-success">{{ task.project.teams.first.name }}</a>
+                       class="badge rounded-pill bg-success">{{ task.project.teams.first.name }}</a>
                   {% else %}
                     <span
                         class="badge rounded-pill bg-warning">No Team</span>
@@ -38,7 +38,8 @@
                 </dd>
                 <dt class="col-sm-3">Project:</dt>
                 <dd class="col-sm-9">
-                  <a href="{% url "task_manager:project-detail" pk=task.project_id %}" class="badge rounded-pill bg-dark">
+                  <a href="{% url "task_manager:project-detail" pk=task.project_id %}"
+                     class="badge rounded-pill bg-dark">
                     {{ task.project }}
                   </a>
                 </dd>

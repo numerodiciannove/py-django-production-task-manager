@@ -19,9 +19,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = (
-    "django-insecure-#l&!7t#45@i(8%s^r8@&_n@dz4wb5rt(f9gj8)m*8-vat5y1zc"
-)
+SECRET_KEY = "django-insecure-#l&!7t#45@i(8%s^r8@&_n@dz4wb5rt(f9gj8)m*8-vat5y1zc"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -110,7 +108,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 DEBUG_TOOLBAR_CONFIG = {
-    'SHOW_TOOLBAR_CALLBACK': lambda request: DEBUG,
+    "SHOW_TOOLBAR_CALLBACK": lambda request: DEBUG,
 }
 
 # Internationalization
@@ -148,5 +146,4 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
-LOGIN_REDIRECT_URL = '/'
-
+LOGIN_REDIRECT_URL = "/"
