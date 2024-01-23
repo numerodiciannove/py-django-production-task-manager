@@ -375,8 +375,7 @@ class WorkerListView(LoginRequiredMixin, generic.ListView):
     paginate_by = 15
 
     def get_queryset(self):
-        queryset = Worker.objects.order_by("first_name",
-                                           "last_name").prefetch_related(
+        queryset = Worker.objects.prefetch_related(
             "teams__projects", "teams"
         )
 
@@ -395,7 +394,7 @@ class WorkerListView(LoginRequiredMixin, generic.ListView):
         paginator = Paginator(workers_list, self.paginate_by)
 
         page = self.request.GET.get("page")
-        workers_list = paginator.get_page(page)
+        paged_workers = paginator.get_page(page)
 
         positions_names = Worker.objects.values_list(
             "position__name", flat=True
@@ -404,29 +403,33 @@ class WorkerListView(LoginRequiredMixin, generic.ListView):
         workers_info = []
         context["search_form"] = WorkerSearchForm()
 
-        for worker in workers_list:
+        for worker in paged_workers:
             worker_projects_list = worker.teams.all().values_list(
                 "projects__name", "projects__id"
             )
             worker_projects = [
                 {"name": name, "id": id} for name, id in worker_projects_list
             ]
-            worker_teams = worker.teams.values_list("name", flat=True)
+            worker_teams = worker.teams.all()
             workers_info.append(
                 {
                     "projects": worker_projects,
                     "phone_number": worker.phone_number,
                     "email": worker.email,
-                    "position": worker.position.name if worker.position else None,
+                    "position": (
+                        worker.position.name
+                        if worker.position
+                        else None
+                    ),
                     "country": worker.country,
                     "first_name": worker.first_name,
                     "last_name": worker.last_name,
                     "id": worker.id,
-                    "teams": list(worker_teams),
+                    "teams": worker_teams,
                 }
             )
 
-        context["workers_list"] = workers_list
+        context["workers_list"] = paged_workers
         context["positions_names"] = positions_names
         context["workers_info"] = workers_info
 
