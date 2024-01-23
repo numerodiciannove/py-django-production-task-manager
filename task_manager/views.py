@@ -1,4 +1,5 @@
-from django.db.models import Count
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Count, Q
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views import generic
@@ -7,7 +8,10 @@ from .forms import (ProjectTaskForm,
                     TaskForm,
                     WorkerForm,
                     TeamForm,
-                    PositionForm
+                    PositionForm,
+                    WorkerSearchForm,
+                    TeamSearchForm,
+                    PositionSearchForm,
                     )
 from .utils import calculate_percentage
 from task_manager.models import Task, Worker, Project, Team, Position
@@ -85,7 +89,7 @@ def index(request):
     return render(request, "index.html", context=context)
 
 
-class ProjectListView(generic.ListView):
+class ProjectListView(LoginRequiredMixin, generic.ListView):
     model = Project
     context_object_name = "project_list"
     template_name = "task_manager/projects/projects_list.html"
@@ -150,7 +154,7 @@ class ProjectListView(generic.ListView):
         return project_info
 
 
-class ProjectDetailView(generic.DetailView):
+class ProjectDetailView(LoginRequiredMixin, generic.DetailView):
     model = Project
     template_name = 'task_manager/projects/project_detail.html'
 
@@ -182,7 +186,7 @@ class ProjectDetailView(generic.DetailView):
         return tasks_info
 
 
-class ProjectCreateView(generic.CreateView):
+class ProjectCreateView(LoginRequiredMixin, generic.CreateView):
     model = Project
     form_class = ProjectForm
     template_name = 'task_manager/projects/project_create_update.html'
@@ -194,7 +198,7 @@ class ProjectCreateView(generic.CreateView):
         return context
 
 
-class ProjectUpdateView(generic.UpdateView):
+class ProjectUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Project
     form_class = ProjectForm
     template_name = 'task_manager/projects/project_create_update.html'
@@ -214,7 +218,7 @@ class ProjectUpdateView(generic.UpdateView):
         return context
 
 
-class ProjectDeleteView(generic.DeleteView):
+class ProjectDeleteView(LoginRequiredMixin, generic.DeleteView):
     model = Project
     template_name = 'task_manager/projects/project_delete.html'
     success_url = reverse_lazy("task_manager:projects-list")
@@ -258,7 +262,7 @@ def project_task_update(request, project_id, task_id):
                   {'form': form, 'project': project, "name": "update"})
 
 
-class ProjectTaskDeleteView(generic.DeleteView):
+class ProjectTaskDeleteView(LoginRequiredMixin, generic.DeleteView):
     model = Task
     template_name = 'task_manager/tasks/task_delete.html'
     context_object_name = 'task'
@@ -276,7 +280,7 @@ class ProjectTaskDeleteView(generic.DeleteView):
         return task
 
 
-class TaskListView(generic.ListView):
+class TaskListView(LoginRequiredMixin, generic.ListView):
     model = Task
     context_object_name = "task_list"
     template_name = "task_manager/tasks/tasks_list.html"
@@ -327,7 +331,7 @@ class TaskListView(generic.ListView):
         return task_info
 
 
-class TaskDetailView(generic.DetailView):
+class TaskDetailView(LoginRequiredMixin, generic.DetailView):
     model = Task
     template_name = 'task_manager/tasks/task_detail.html'
 
@@ -337,13 +341,13 @@ class TaskDetailView(generic.DetailView):
         ).all()
 
 
-class TaskDeleteView(generic.DeleteView):
+class TaskDeleteView(LoginRequiredMixin, generic.DeleteView):
     model = Task
     template_name = 'task_manager/tasks/task_delete.html'
     success_url = reverse_lazy("task_manager:tasks-list")
 
 
-class TaskUpdateView(generic.UpdateView):
+class TaskUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Task
     form_class = TaskForm
     template_name = 'task_manager/tasks/task_create_update.html'
@@ -355,7 +359,7 @@ class TaskUpdateView(generic.UpdateView):
         return context
 
 
-class TaskCreateView(generic.CreateView):
+class TaskCreateView(LoginRequiredMixin, generic.CreateView):
     model = Task
     form_class = TaskForm
     template_name = 'task_manager/tasks/task_create_update.html'
@@ -367,17 +371,30 @@ class TaskCreateView(generic.CreateView):
         return context
 
 
-class WorkerListView(generic.ListView):
+class WorkerListView(LoginRequiredMixin, generic.ListView):
     model = Worker
     context_object_name = "worker_list"
     template_name = "task_manager/workers/workers_list.html"
 
     def get_queryset(self):
-        return Worker.objects.order_by(
-            'first_name', 'last_name',
+        queryset = Worker.objects.order_by(
+            'first_name', 'last_name'
         ).prefetch_related(
             'teams__projects', 'teams',
         )
+
+        if self.request.GET.get("search_first_last_name"):
+            search_query = self.request.GET.get("search_first_last_name")
+            queryset = queryset.filter(
+                Q(
+                    first_name__icontains=search_query
+                ) |
+                Q(
+                    last_name__icontains=search_query
+                )
+            )
+
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -386,6 +403,7 @@ class WorkerListView(generic.ListView):
             'position__name', flat=True
         ).distinct()
         workers_info = []
+        context["search_form"] = WorkerSearchForm()
 
         for worker in workers_list:
             worker_projects_list = worker.teams.all().values_list(
@@ -410,11 +428,12 @@ class WorkerListView(generic.ListView):
         context["workers_list"] = workers_list
         context["positions_names"] = positions_names
         context["workers_info"] = workers_info
+        context["search_form"] = WorkerSearchForm()
 
         return context
 
 
-class WorkerDetailView(generic.DetailView):
+class WorkerDetailView(LoginRequiredMixin, generic.DetailView):
     model = Worker
     context_object_name = "worker"
     template_name = "task_manager/workers/worker_detail.html"
@@ -430,7 +449,7 @@ class WorkerDetailView(generic.DetailView):
         return context
 
 
-class WorkerCreateView(generic.CreateView):
+class WorkerCreateView(LoginRequiredMixin, generic.CreateView):
     model = Worker
     form_class = WorkerForm
     template_name = 'task_manager/workers/worker_create_update.html'
@@ -442,13 +461,13 @@ class WorkerCreateView(generic.CreateView):
         return context
 
 
-class WorkerDeleteView(generic.DeleteView):
+class WorkerDeleteView(LoginRequiredMixin, generic.DeleteView):
     model = Worker
     template_name = 'task_manager/workers/worker_delete.html'
     success_url = reverse_lazy("task_manager:workers-list")
 
 
-class WorkerUpdateView(generic.CreateView):
+class WorkerUpdateView(LoginRequiredMixin, generic.CreateView):
     model = Worker
     form_class = WorkerForm
     template_name = 'task_manager/workers/worker_create_update.html'
@@ -460,15 +479,21 @@ class WorkerUpdateView(generic.CreateView):
         return context
 
 
-class TeamListView(generic.ListView):
+class TeamListView(LoginRequiredMixin, generic.ListView):
     model = Team
     context_object_name = "team_list"
     template_name = "task_manager/teams/teams_list.html"
 
     def get_queryset(self):
-        return Team.objects.annotate(
+        queryset = Team.objects.annotate(
             num_projects=Count('projects')
         ).order_by('-num_projects', 'name')
+
+        search_query = self.request.GET.get("search_by_team_name")
+        if search_query:
+            queryset = queryset.filter(name__icontains=search_query)
+
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -502,10 +527,11 @@ class TeamListView(generic.ListView):
             })
 
         context["teams_info"] = teams_info
+        context["search_form"] = TeamSearchForm()
         return context
 
 
-class TeamDetailView(generic.DetailView):
+class TeamDetailView(LoginRequiredMixin, generic.DetailView):
     model = Team
     context_object_name = "team"
     template_name = "task_manager/teams/team_detail.html"
@@ -521,7 +547,7 @@ class TeamDetailView(generic.DetailView):
         return context
 
 
-class TeamUpdateView(generic.UpdateView):
+class TeamUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Team
     form_class = TeamForm
     template_name = 'task_manager/teams/team_create_update.html'
@@ -533,7 +559,7 @@ class TeamUpdateView(generic.UpdateView):
         return context
 
 
-class TeamCreateView(generic.CreateView):
+class TeamCreateView(LoginRequiredMixin, generic.CreateView):
     model = Team
     form_class = TeamForm
     template_name = 'task_manager/teams/team_create_update.html'
@@ -545,40 +571,46 @@ class TeamCreateView(generic.CreateView):
         return context
 
 
-class TeamDeleteView(generic.DeleteView):
+class TeamDeleteView(LoginRequiredMixin, generic.DeleteView):
     model = Team
     template_name = 'task_manager/teams/team_delete.html'
     success_url = reverse_lazy("task_manager:teams-list")
 
 
-class PositionListView(generic.ListView):
+class PositionListView(LoginRequiredMixin, generic.ListView):
     model = Position
     context_object_name = "position_list"
     template_name = "task_manager/positions/positions_list.html"
 
     def get_queryset(self):
-        return Position.objects.all()
+        queryset = Position.objects.all()
+
+        search_query = self.request.GET.get("search_by_position")
+        if search_query:
+            queryset = queryset.filter(name__icontains=search_query)
+
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        print(context["position_list"])
+        context["search_form"] = PositionSearchForm()
         return context
 
 
-class PositionDeleteView(generic.DeleteView):
+class PositionDeleteView(LoginRequiredMixin, generic.DeleteView):
     model = Position
     template_name = 'task_manager/positions/position_delete.html'
     success_url = reverse_lazy("task_manager:positions-list")
 
 
-class PositionCreateView(generic.CreateView):
+class PositionCreateView(LoginRequiredMixin, generic.CreateView):
     model = Position
     form_class = PositionForm
     template_name = 'task_manager/positions/position_create_update.html'
     success_url = reverse_lazy("task_manager:positions-list")
 
 
-class PositionUpdateView(generic.UpdateView):
+class PositionUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Position
     form_class = PositionForm
     template_name = 'task_manager/positions/position_create_update.html'

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load crispy_forms_filters %}
 
 {% block content %}
   <a href="{% url "task_manager:worker-create" %}" class="d-grid gap-2">
@@ -6,6 +7,7 @@
   </a>
   <br>
   <hr>
+  {% include "includes/search_form.html" %}
   <table class="table table-bordered mt-4" id="taskTable">
     <thead>
     <tr class="text-uppercase">
@@ -31,7 +33,7 @@
           </a>
         </td>
         <td>{{ worker_info.position }}</td>
-        <td>{{ worker_info.teams|join:', '}}</td>
+        <td>{{ worker_info.teams|join:', ' }}</td>
         <td>
           {% if worker_info.projects %}
             {% for project_info in worker_info.projects %}

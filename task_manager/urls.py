@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.conf.urls.static import static
-from django.urls import path
+from django.urls import path, include
 from task_manager.views import (
     index,
     ProjectListView,
@@ -152,5 +152,6 @@ urlpatterns = [
                       "position/<int:pk>:/update/",
                       PositionUpdateView.as_view(),
                       name="position-update"),
+                  path('accounts/', include('django.contrib.auth.urls')),
               ] + static(settings.STATIC_URL,
                          document_root=settings.STATIC_ROOT)

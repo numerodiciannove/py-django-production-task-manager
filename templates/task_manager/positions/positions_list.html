@@ -6,7 +6,7 @@
       <a href="{% url 'task_manager:position-create' %}" class="btn btn-dark">Create Position</a>
     </div>
     <hr>
-
+    {% include "includes/search_form.html" %}
     <div class="task-list-box" id="landing-task">
       {% for position_info in position_list %}
         <div id="task-item-{{ forloop.counter }}">

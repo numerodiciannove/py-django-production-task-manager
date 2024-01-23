@@ -124,3 +124,42 @@ class PositionForm(forms.ModelForm):
     class Meta:
         model = Position
         fields = "__all__"
+
+
+class WorkerSearchForm(forms.Form):
+    search_first_last_name = forms.CharField(
+        label="",
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "placeholder":
+                    "Search: For example, Terry Richardson. "
+                    "Another enter just the First Name or Last Name."
+            })
+    )
+
+
+class TeamSearchForm(forms.Form):
+    search_by_team_name = forms.CharField(
+        label="",
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "placeholder":
+                    "Search: by team name"
+            }
+        )
+    )
+
+
+class PositionSearchForm(forms.Form):
+    search_by_position = forms.CharField(
+        label="",
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "placeholder":
+                    "Search: by position name"
+            }
+        )
+    )
