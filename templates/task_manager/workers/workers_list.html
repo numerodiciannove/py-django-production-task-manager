@@ -32,7 +32,11 @@
           </a>
         </td>
         <td>{{ worker_info.position }}</td>
-        <td>{{ worker_info.teams|join:', ' }}</td>
+        <td>
+          {% for worker_teams in worker_info.teams %}
+            <a href="{% url "task_manager:team-detail" pk=worker_teams.id %}">{{ worker_teams.name }}</a>
+          {% endfor %}
+        </td>
         <td>
           {% if worker_info.projects %}
             {% for project_info in worker_info.projects %}
