@@ -3,9 +3,10 @@
 {% block content %}
   <div class="container">
     <div class="d-grid gap-2">
-      <a href="{% url 'task_manager:position-create' %}" class="btn btn-dark">Create Position</a>
+      <a href="{% url 'task_manager:position-create' %}" class="btn btn-dark">Create
+        Position</a>
     </div>
-    <hr>
+    <br>
     {% include "includes/search_form.html" %}
     <div class="task-list-box" id="landing-task">
       {% for position_info in position_list %}
@@ -16,17 +17,20 @@
                 <div class="col-xl-4 col-sm-3">
                   <div class="checklist form-check font-size-15">
                     <label class="form-check-label ms-2 me-2 task-title">
-                      <span class="bi bi-emoji-sunglasses-fill" style="color: gray"></span>
+                      <span class="bi bi-emoji-sunglasses-fill"
+                            style="color: gray"></span>
                       <strong>{{ position_info.name }}</strong>
                     </label>
                   </div>
                 </div><!-- end col -->
                 <div class="col-xl-8 col-sm-9">
                   <div class="d-flex justify-content-end gap-2">
-                    <a href="{% url 'task_manager:position-update' pk=position_info.id %}" class="btn btn-dark btn-sm" title="Edit">
+                    <a href="{% url 'task_manager:position-update' pk=position_info.id %}"
+                       class="btn btn-dark btn-sm" title="Edit">
                       <i class="bi bi-pencil"></i>
                     </a>
-                    <a href="{% url 'task_manager:position-delete' pk=position_info.id %}" class="btn btn-danger btn-sm" title="Delete">
+                    <a href="{% url 'task_manager:position-delete' pk=position_info.id %}"
+                       class="btn btn-danger btn-sm" title="Delete">
                       <i class="bi bi-trash"></i>
                     </a>
                   </div>
@@ -36,6 +40,8 @@
           </div>
         </div>
       {% endfor %}
+      <hr>
+      {% include "includes/pagination.html" %}
     </div>
   </div>
 {% endblock %}

@@ -6,7 +6,6 @@
     <button class="btn btn-dark" type="button">Create worker</button>
   </a>
   <br>
-  <hr>
   {% include "includes/search_form.html" %}
   <table class="table table-bordered mt-4" id="taskTable">
     <thead>
@@ -61,6 +60,8 @@
     {% endfor %}
     </tbody>
   </table>
+  <hr>
+  {% include "includes/pagination.html" %}
   {% load static %}
   <script src="{% static 'js/task_list.js' %}"></script>
 {% endblock %}

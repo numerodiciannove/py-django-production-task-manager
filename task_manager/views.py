@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
@@ -375,33 +376,34 @@ class WorkerListView(LoginRequiredMixin, generic.ListView):
     model = Worker
     context_object_name = "worker_list"
     template_name = "task_manager/workers/workers_list.html"
+    paginate_by = 15
 
     def get_queryset(self):
-        queryset = Worker.objects.order_by(
-            'first_name', 'last_name'
-        ).prefetch_related(
-            'teams__projects', 'teams',
-        )
+        queryset = Worker.objects.order_by('first_name',
+                                           'last_name').prefetch_related(
+            'teams__projects', 'teams')
 
         if self.request.GET.get("search_first_last_name"):
             search_query = self.request.GET.get("search_first_last_name")
             queryset = queryset.filter(
-                Q(
-                    first_name__icontains=search_query
-                ) |
-                Q(
-                    last_name__icontains=search_query
-                )
+                Q(first_name__icontains=search_query) |
+                Q(last_name__icontains=search_query)
             )
 
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        workers_list = self.get_queryset()
-        positions_names = workers_list.values_list(
+        workers_list = context['worker_list']
+        paginator = Paginator(workers_list, self.paginate_by)
+
+        page = self.request.GET.get('page')
+        workers_list = paginator.get_page(page)
+
+        positions_names = Worker.objects.values_list(
             'position__name', flat=True
         ).distinct()
+
         workers_info = []
         context["search_form"] = WorkerSearchForm()
 
@@ -428,7 +430,6 @@ class WorkerListView(LoginRequiredMixin, generic.ListView):
         context["workers_list"] = workers_list
         context["positions_names"] = positions_names
         context["workers_info"] = workers_info
-        context["search_form"] = WorkerSearchForm()
 
         return context
 
@@ -581,6 +582,7 @@ class PositionListView(LoginRequiredMixin, generic.ListView):
     model = Position
     context_object_name = "position_list"
     template_name = "task_manager/positions/positions_list.html"
+    paginate_by = 10
 
     def get_queryset(self):
         queryset = Position.objects.all()
