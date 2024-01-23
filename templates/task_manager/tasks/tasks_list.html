@@ -47,7 +47,7 @@
       <tbody>
       {% for task in task_info %}
         <tr class="{% if task.is_complete %}complete-task{% else %}incomplete-task{% endif %}">
-          <th scope="row">{{ forloop.parentloop.counter }}</th>
+          <th scope="row">{{ forloop.counter }}</th>
           <td>
             <a href="{% url 'task_manager:task-detail' pk=task.id %}">
               <span class="bi bi-star-fill"></span>
@@ -55,10 +55,10 @@
             </a>
           </td>
           <td>
-        <span
-            class="badge rounded-pill {% if task.is_complete %} bg-danger {% else %} bg-success {% endif %}">
-          {% if task.is_complete %}Completed{% else %}Active{% endif %}
-        </span>
+            <span
+                class="badge rounded-pill {% if task.is_complete %} bg-danger {% else %} bg-success {% endif %}">
+              {% if task.is_complete %}Completed{% else %}Active{% endif %}
+            </span>
           </td>
           <td>
             {% for task_type in task.task_types %}
@@ -79,10 +79,10 @@
           <td>{{ task.task_start_time }}</td>
           <td>{{ task.deadlines }}</td>
           <td>
-          <span
-              class="badge {% if task.priorities == 'urgent' %}bg-danger{% elif task.priorities == 'height' %}bg-warning{% elif task.priorities == 'medium' %}bg-info{% elif task.priorities == 'low' %}bg-success{% endif %}">
-            {{ task.priorities }}
-          </span>
+            <span
+                class="badge {% if task.priorities == 'urgent' %}bg-danger{% elif task.priorities == 'height' %}bg-warning{% elif task.priorities == 'medium' %}bg-info{% elif task.priorities == 'low' %}bg-success{% endif %}">
+              {{ task.priorities }}
+            </span>
           </td>
           <td class="align-middle">
             <a href="{% url "task_manager:task-delete" pk=task.id %}">
