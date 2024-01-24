@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="gradient-custom">
+    <div class="container-fluid h-100">
+      <div class="row h-100">
+        <div class="col-xl-10 mx-auto d-flex flex-column h-100">
+          <div class="card flex-grow-1">
+            <div class="card-body p-5">
+              <div class="d-flex justify-content-between align-items-center">
+                <p class="h2">{{ project.name }}</p>
+                <div>
+                  {% if project.is_complete %}
+                    <span class="badge bg-danger">Completed</span>
+                  {% else %}
+                    <span class="badge bg-success">Active</span>
+                  {% endif %}
+                </div>
+                <div>
+                  <a href="{% url 'task_manager:project-update' project_id=project.id %}"
+                     class="btn btn-dark btn-sm"><i
+                      class="bi bi-pencil"></i></a>
+                  <a href="{% url 'task_manager:project-delete' pk=project.id %}"
+                     class="btn btn-danger btn-sm"><i
+                      class="bi bi-trash3-fill"></i></a>
+                </div>
+              </div>
+              <dl class="row" style="color: black;">
+                <dt class="col-sm-3">Team:</dt>
+                <dd class="col-sm-9">
+                  {% if project.teams.first %}
+                    <a href="{% url "task_manager:team-detail" pk=project.teams.first.id %}"
+                       class="badge rounded-pill bg-success">{{ project.teams.first.name }}</a>
+                  {% else %}
+                    <span class="badge rounded-pill bg-warning">No Team</span>
+                  {% endif %}
+                </dd>
+
+                {% if project.teams.first %}
+                  <dt class="col-sm-3">Workers:</dt>
+                  <dd class="col-sm-9">
+                    <table class="table">
+                      <thead>
+                      <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Position</th>
+                        <th scope="col">Country</th>
+                        <th scope="col">Phone Number</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      {% for worker in project_workers %}
+                        <tr>
+                          <td>
+                            <a href="{% url "task_manager:worker-detail" pk=worker.id %}">
+                              {{ worker.first_name }} {{ worker.last_name }}
+                            </a>
+                          </td>
+                          <td>{{ worker.position }}</td>
+                          <td>{{ worker.country }}</td>
+                          <td>{{ worker.phone_number }}</td>
+                        </tr>
+                      {% endfor %}
+                      </tbody>
+                    </table>
+                  </dd>
+                {% endif %}
+                <dt class="col-sm-3">Description:</dt>
+                <dd class="col-sm-9">{{ project.description }}</dd>
+                {% if project.budget %}
+                  <dt class="col-sm-3">Budget:</dt>
+                  <dd class="col-sm-9">
+                    <span
+                        class="badge rounded-pill bg-success">{{ project.budget }}$</span>
+                  </dd>
+                {% endif %}
+              </dl>
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <p class="h4">Tasks:</p>
+                </div>
+                <div>
+                  <a href="{% url 'task_manager:project-task-create' pk=project.id %}"
+                     class="btn btn-dark btn-sm">Add Task</a>
+                </div>
+              </div>
+              <hr>
+              <div class="tab-content" id="ex1-content">
+                <div class="accordion" id="accordionPanelsStayOpenExample">
+                  {% for task in project_tasks %}
+                    {% include "includes/task_accordion.html" %}
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <br>
+{% endblock %}

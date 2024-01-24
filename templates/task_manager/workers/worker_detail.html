@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="gradient-custom">
+    <div class="container-fluid h-100">
+      <div class="row h-100">
+        <div class="col-xl-10 mx-auto d-flex flex-column h-100">
+          <div class="card flex-grow-1">
+            <div class="card-body p-5">
+              <div class="d-flex justify-content-between align-items-center">
+                <p class="h2">{{ worker.first_name }} {{ worker.last_name }}</p>
+                <div>
+                  <a href="{% url "task_manager:worker-update" pk=worker.id %}"
+                     class="btn btn-dark btn-sm"><i
+                      class="bi bi-pencil"></i></a>
+                  <a href="{% url "task_manager:worker-delete" pk=worker.id %}"
+                     class="btn btn-danger btn-sm"><i
+                      class="bi bi-trash3-fill"></i></a>
+                </div>
+              </div>
+              <dl class="row" style="color: black;">
+                <dt class="col-sm-3">Email:</dt>
+                {% if worker.email %}
+                  <dd class="col-sm-9">{{ worker.email }}</dd>
+                {% endif %}
+                {% if worker.phone_number %}
+                  <dt class="col-sm-3">Phone Number:</dt>
+                  <dd class="col-sm-9">
+                    <span
+                        class="badge bg-dark">{{ worker.phone_number }}</span>
+                  </dd>
+                {% endif %}
+                {% if worker.country %}
+                  <dt class="col-sm-3">Country:</dt>
+                  <dd class="col-sm-9">
+                    <span class="badge bg-dark">{{ worker.country }}</span>
+                  </dd>
+                {% endif %}
+                {% if worker.position %}
+                  <dt class="col-sm-3">Position:</dt>
+                  <dd class="col-sm-9">
+                    <span class="badge bg-dark">{{ worker.position }}</span>
+                  </dd>
+                {% endif %}
+                {% if worker.teams.all %}
+                  <dt class="col-sm-3">Teams:</dt>
+                  <dd class="col-sm-9">
+                    {% if worker.teams %}
+                      {% for team in worker.teams.all %}
+                        <div>
+                          <a href="#">{{ team.name }}</a>
+                        </div>
+                      {% endfor %}
+                    {% else %}
+                      <span
+                          class="badge rounded-pill bg-warning">No Teams</span>
+                    {% endif %}
+                  </dd>
+                {% endif %}
+                <dt class="col-sm-3">Projects:</dt>
+                <dd class="col-sm-9">
+                  {% if projects %}
+                    {% for project in projects %}
+                      <div>
+                        <a href="{% url "task_manager:project-detail"  pk=project.id %}">{{ project.name }}</a>
+                      </div>
+                    {% endfor %}
+                  {% else %}
+                    <span
+                        class="badge rounded-pill bg-warning">No Projects</span>
+                  {% endif %}
+                </dd>
+                <dt class="col-sm-3">Tasks:</dt>
+                <dd class="col-sm-9">
+                  {% if tasks_in_projects %}
+                    <ul>
+                      {% for task in tasks_in_projects %}
+                        <li>
+                          <a href="{% url "task_manager:task-detail" pk=task.id %}">
+                            {% if task.is_complete %}
+                              <span class="text-danger"
+                                    style="text-decoration: line-through;">{{ task.name }}</span>
+                            {% else %}
+                              {{ task.name }}
+                            {% endif %}
+                          </a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  {% else %}
+                    <span class="badge rounded-pill bg-warning">No Tasks</span>
+                  {% endif %}
+                </dd>
+              </dl>
+              <hr>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <br>
+{% endblock %}

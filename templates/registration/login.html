@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load crispy_forms_filters %}
+
+{% block content %}
+  <div class="row h-100">
+    <div class="col-xl-10 mx-auto d-flex flex-column h-100">
+      <div class="card flex-grow-1">
+        <div class="card-body p-5">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              {% if form.errors %}
+                <p style="color: darkred">Your username and password didn't
+                  match. Please try
+                  again.</p>
+              {% endif %}
+              <div></div>
+              <h1>Login</h1>
+            </div>
+          </div>
+          <div>
+            {% if next %}
+              <p>Please login to see this page.</p>
+            {% endif %}
+
+            <form method="post" action="{% url 'login' %}">
+              {% csrf_token %}
+              {{ form|crispy }}
+
+              <input type="submit" value="Login" class="btn btn-primary"/>
+              <input type="hidden" name="next" value="{{ next }}"/>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

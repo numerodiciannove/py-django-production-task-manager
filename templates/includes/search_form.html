@@ -1,0 +1,14 @@
+{% load crispy_forms_filters %}
+
+<div class="container-fluid">
+  <form method="get" action="" class="row">
+    <div class="col-9">
+      {{ search_form|crispy }}
+    </div>
+    <div class="col-3">
+      <button type="submit" class="btn btn-light w-100">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </form>
+</div>
