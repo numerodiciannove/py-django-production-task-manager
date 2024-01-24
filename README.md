@@ -1,4 +1,4 @@
-# Project Task Manager
+# Task Manager for fashion production
 
 ## Overview
 
@@ -81,7 +81,7 @@ and track their projects, tasks, and team members.
 
 1. **Clone the Repository:**
    ```bash
-   git clone [repository_link]
+   git clone repository_link
 2. **Navigate to Project Directory:**
     ```bash
    cd path/to/your/directory
@@ -117,10 +117,10 @@ and track their projects, tasks, and team members.
 
 Feel free to reach out if you have any questions or suggestions!
 
-#### DB-structure diagram
-![Photo1](static/project_screenshots/DB-structure diagram.png)
+#### DB-structure diagram:
+![Photo1](static/project_screenshots/db_structure.png)
 
-#### Screenshots
+#### Screenshots:
 ![Photo1](static/project_screenshots/1.jpg)
 ![Photo1](static/project_screenshots/2.jpg)
 ![Photo1](static/project_screenshots/3.jpg)
