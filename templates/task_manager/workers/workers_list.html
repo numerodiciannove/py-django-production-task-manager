@@ -51,7 +51,7 @@
         <td>{{ worker_info.phone_number }}</td>
         <td>{{ worker_info.email }}</td>
         <td class="align-middle">
-          <a href="{% url "blog:worker-delete" pk=worker_info.id %}">
+          <a href="{% url "task_manager:worker-delete" pk=worker_info.id %}">
             <button type="button" class="btn btn-danger btn-sm"><i
                 class="bi bi-trash3-fill"></i></button>
           </a>
