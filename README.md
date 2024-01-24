@@ -118,7 +118,7 @@ and track their projects, tasks, and team members.
 Feel free to reach out if you have any questions or suggestions!
 
 #### DB-structure diagram:
-![Photo1](static/project_screenshots/db_structure.png)
+![Photo1](static/project_screenshots/dbstructure.jpg)
 
 #### Screenshots:
 ![Photo1](static/project_screenshots/1.jpg)
