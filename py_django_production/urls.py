@@ -21,5 +21,4 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("django.contrib.auth.urls")),
     path("", include("task_manager.urls", namespace="blog")),
-    path("__debug__/", include("debug_toolbar.urls")),
 ]
