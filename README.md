@@ -6,6 +6,13 @@ This project is a comprehensive task manager tailored for fashion productions,
 built using Django. It allows fashion production teams to efficiently organize
 and track their projects, tasks, and team members.
 
+## Check it out!
+
+[Production Task Manager project deployed to Render](https://production-taskmanager.onrender.com/)
+
+- login: admin
+- password: Admin1919
+
 ## Features
 
 ### Projects
