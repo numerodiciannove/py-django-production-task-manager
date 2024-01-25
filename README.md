@@ -10,8 +10,8 @@ and track their projects, tasks, and team members.
 
 [Production Task Manager project deployed to Render](https://production-taskmanager.onrender.com/)
 
-- login: admin
-- password: Admin1919
+- login: user
+- password: user12345
 
 ## Features
 
