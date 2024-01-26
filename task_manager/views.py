@@ -2,7 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views import generic
 from .forms import (
     ProjectTaskForm,
@@ -25,39 +25,36 @@ def index(request):
     num_projects = Project.objects.count()
     num_teams = Team.objects.count()
     num_positions = Position.objects.count()
-    num_incomplete_projects = Project.objects.filter(is_complete=False).count()
-    num_completed_projects = Project.objects.filter(is_complete=True).count()
-    num_incomplete_tasks = Task.objects.filter(is_complete=False).count()
-    num_completed_tasks = Task.objects.filter(is_complete=True).count()
     num_visits = request.session.get("num_visits", 0)
     request.session["num_visits"] = num_visits + 1
 
-    percent_tasks_completed = calculate_percentage(num_completed_tasks,
-                                                   num_tasks)
-    percent_projects_completed = calculate_percentage(
-        num_completed_projects, num_projects
+    aggregate_data = Project.objects.aggregate(
+        num_incomplete_projects=Count("id", filter=Q(is_complete=False)),
+        num_completed_projects=Count("id", filter=Q(is_complete=True)),
+        num_incomplete_tasks=Count("id", filter=Q(is_complete=False)),
+        num_completed_tasks=Count("id", filter=Q(is_complete=True)),
     )
 
     cards = [
         {
             "name": "Projects in work",
             "icon_name": "ui-checks-grid",
-            "num_value": num_incomplete_projects,
+            "num_value": aggregate_data["num_incomplete_projects"],
         },
         {
             "name": "Completed projects",
             "icon_name": "check-square",
-            "num_value": num_completed_projects,
+            "num_value": aggregate_data["num_completed_projects"],
         },
         {
             "name": "Tasks in work",
             "icon_name": "list-task",
-            "num_value": num_incomplete_tasks,
+            "num_value": aggregate_data["num_incomplete_tasks"],
         },
         {
             "name": "Completed tasks",
             "icon_name": "list-check",
-            "num_value": num_completed_tasks,
+            "num_value": aggregate_data["num_completed_tasks"],
         },
         {"name": "Workers", "icon_name": "people-fill",
          "num_value": num_workers},
@@ -71,6 +68,13 @@ def index(request):
         {"name": "Page visits", "icon_name": "file-earmark",
          "num_value": num_visits},
     ]
+
+    percent_tasks_completed = calculate_percentage(
+        aggregate_data["num_completed_tasks"], num_tasks
+    )
+    percent_projects_completed = calculate_percentage(
+        aggregate_data["num_completed_projects"], num_projects
+    )
 
     context = {
         "percent_tasks_completed": percent_tasks_completed,
@@ -218,43 +222,54 @@ class ProjectDeleteView(LoginRequiredMixin, generic.DeleteView):
     success_url = reverse_lazy("task_manager:projects-list")
 
 
-def project_task_create(request, pk):
-    project = Project.objects.get(pk=pk)
+class ProjectTaskCreateView(generic.CreateView):
+    model = Project
+    form_class = ProjectTaskForm
+    template_name = "task_manager/tasks/task_create_update.html"
+    context_object_name = "project"
 
-    if request.method == "POST":
-        form = ProjectTaskForm(request.POST)
-        if form.is_valid():
-            task = form.save(commit=False)
-            task.project = project
-            task.save()
-            return redirect("task_manager:project-detail", pk=project.id)
-    else:
-        form = ProjectTaskForm()
+    def form_valid(self, form):
+        project = self.get_object()
+        task = form.save(commit=False)
+        task.project = project
+        task.save()
+        return redirect("task_manager:project-detail", pk=project.id)
 
-    return render(
-        request,
-        "task_manager/tasks/task_create_update.html",
-        {"form": form, "project": project, "name": "create"},
-    )
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["name"] = "create"
+        return context
+
+    def get_success_url(self):
+        return reverse("task_manager:project-detail",
+                       kwargs={"pk": self.object.id})
 
 
-def project_task_update(request, project_id, task_id):
-    project = get_object_or_404(Project, pk=project_id)
-    task = get_object_or_404(Task, pk=task_id, project=project)
+class ProjectTaskUpdateView(generic.UpdateView):
+    model = Task
+    form_class = ProjectTaskForm
+    template_name = "task_manager/tasks/task_create_update.html"
+    context_object_name = "project"
 
-    if request.method == "POST":
-        form = ProjectTaskForm(request.POST, instance=task)
-        if form.is_valid():
-            form.save()
-            return redirect("task_manager:project-detail", pk=project.id)
-    else:
-        form = ProjectTaskForm(instance=task)
+    def get_object(self, queryset=None):
+        project_id = self.kwargs.get("project_id")
+        task_id = self.kwargs.get("task_id")
+        return get_object_or_404(Task, pk=task_id, project__pk=project_id)
 
-    return render(
-        request,
-        "task_manager/tasks/task_create_update.html",
-        {"form": form, "project": project, "name": "update"},
-    )
+    def form_valid(self, form):
+        project = self.get_object().project
+        form.save()
+        return redirect("task_manager:project-detail", pk=project.id)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["name"] = "update"
+        return context
+
+    def get_success_url(self):
+        project = self.get_object().project
+        return reverse("task_manager:project-detail",
+                       kwargs={"pk": project.id})
 
 
 class ProjectTaskDeleteView(LoginRequiredMixin, generic.DeleteView):
@@ -375,9 +390,7 @@ class WorkerListView(LoginRequiredMixin, generic.ListView):
     paginate_by = 15
 
     def get_queryset(self):
-        queryset = Worker.objects.prefetch_related(
-            "teams__projects", "teams"
-        )
+        queryset = Worker.objects.prefetch_related("teams__projects", "teams")
 
         if self.request.GET.get("search_first_last_name"):
             search_query = self.request.GET.get("search_first_last_name")
@@ -417,10 +430,7 @@ class WorkerListView(LoginRequiredMixin, generic.ListView):
                     "phone_number": worker.phone_number,
                     "email": worker.email,
                     "position": (
-                        worker.position.name
-                        if worker.position
-                        else None
-                    ),
+                        worker.position.name if worker.position else None),
                     "country": worker.country,
                     "first_name": worker.first_name,
                     "last_name": worker.last_name,

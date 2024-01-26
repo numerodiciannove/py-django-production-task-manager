@@ -6,8 +6,6 @@ from task_manager.views import (
     ProjectListView,
     ProjectDetailView,
     ProjectTaskDeleteView,
-    project_task_create,
-    project_task_update,
     ProjectCreateView,
     ProjectDeleteView,
     ProjectUpdateView,
@@ -30,6 +28,8 @@ from task_manager.views import (
     PositionDeleteView,
     PositionCreateView,
     PositionUpdateView,
+    ProjectTaskCreateView,
+    ProjectTaskUpdateView,
 )
 
 app_name = "task_manager"
@@ -42,22 +42,22 @@ urlpatterns = [
                       name="tasks-list",
                   ),
                   path(
-                      "task/<int:pk>",
+                      "task/<int:pk>/",
                       TaskDetailView.as_view(),
                       name="task-detail",
                   ),
                   path(
-                      "task/create",
+                      "task/create/",
                       TaskCreateView.as_view(),
                       name="task-create",
                   ),
                   path(
-                      "task/<int:pk>/delete",
+                      "task/<int:pk>/delete/",
                       TaskDeleteView.as_view(),
                       name="task-delete",
                   ),
                   path(
-                      "task/<int:pk>/update",
+                      "task/<int:pk>/update/",
                       TaskUpdateView.as_view(),
                       name="task-update",
                   ),
@@ -66,11 +66,8 @@ urlpatterns = [
                       ProjectListView.as_view(),
                       name="projects-list",
                   ),
-                  path(
-                      "project/<int:pk>/",
-                      ProjectDetailView.as_view(),
-                      name="project-detail"
-                  ),
+                  path("project/<int:pk>/", ProjectDetailView.as_view(),
+                       name="project-detail"),
                   path("project/create/", ProjectCreateView.as_view(),
                        name="project-create"),
                   path(
@@ -83,12 +80,13 @@ urlpatterns = [
                       name="project-update",
                   ),
                   path(
-                      "project/<int:pk>/create_task/", project_task_create,
-                      name="project-task-create"
+                      "project/<int:pk>/create_task/",
+                      ProjectTaskCreateView.as_view(),
+                      name="project-task-create",
                   ),
                   path(
                       "project/<int:project_id>/task_update/<int:task_id>/",
-                      project_task_update,
+                      ProjectTaskUpdateView.as_view(),
                       name="project-task-update",
                   ),
                   path(
