@@ -1,4 +1,4 @@
-# Task Manager for fashion production
+# Task manager for fashion production
 
 ## Overview
 
